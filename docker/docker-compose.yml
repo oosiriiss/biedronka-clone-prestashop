@@ -11,7 +11,9 @@ services:
       - prestashop_network
   prestashop:
     container_name: prestashop
-    image: prestashop/prestashop:1.7.8.10
+    build:
+      context: ..
+      dockerfile: docker/prestashop/Dockerfile
     restart: unless-stopped
     depends_on:
       - mysql
@@ -35,6 +37,8 @@ services:
     networks:
       - prestashop_network
     volumes:
-      - ../src:/var/www/html
+      # Use only if needed
+      # - ../src/prestashop:/var/www/html
+      - ../src/biedronka-theme:/var/www/html/themes/biedronka
 networks:
     prestashop_network:
