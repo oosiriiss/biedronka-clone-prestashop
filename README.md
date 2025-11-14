@@ -20,6 +20,8 @@ chmod +x ./install.sh
 sudo ./install.sh
 ```
 
+Next, select the theme: `localhost:8080/admin-dev -> Design/Theme & Logo -> My theme for PrestaShop shop -> Biedronka`
+
 # How to run the project
 ```
 cd scripts/
