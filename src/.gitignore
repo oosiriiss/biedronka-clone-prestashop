@@ -1,5 +1,6 @@
 # Cache, temp and personal files
 
+prestashop/
 /.htaccess
 *.log
 

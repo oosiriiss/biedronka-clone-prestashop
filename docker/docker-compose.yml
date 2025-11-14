@@ -2,16 +2,27 @@ version: '3'
 services:
   mysql:
     container_name: some-mysql
-    image: mysql:5.7
+    build:
+      context: ..
+      dockerfile: docker/mysql/Dockerfile
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: toor
       MYSQL_DATABASE: prestashop
+    mem_limit: 1024M
+    cpus: '1.0'
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
     networks:
       - prestashop_network
   prestashop:
     container_name: prestashop
-    image: prestashop/prestashop:1.7.8.10
+    build:
+      context: ..
+      dockerfile: docker/prestashop/Dockerfile
     restart: unless-stopped
     depends_on:
       - mysql
@@ -32,9 +43,18 @@ services:
       ADMIN_PASSWD: password
       PS_FOLDER_ADMIN: admin-dev
       PS_FOLDER_INSTALL: install-dev
+    mem_limit: 1024M
+    cpus: '2.0'
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1024M
     networks:
       - prestashop_network
     volumes:
-      - ../src:/var/www/html
+      # Use only if needed
+      # - ../src/prestashop:/var/www/html
+      - ../src/biedronka-theme:/var/www/html/themes/biedronka
 networks:
     prestashop_network:
