@@ -354,3 +354,7 @@ for cat in categories:
                     print(scraper.get_price_of_item(item_html))
                     # scraper.download_images(item_html)
 
+
+# TODO: Add async
+# TODO: Refactor
+# TODO: Cache html
