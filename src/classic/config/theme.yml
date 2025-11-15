@@ -1,8 +1,8 @@
-name: biedronka
-display_name: Biedronka 
+name: classic
+display_name: classic
 version: 1.0.0
 author:
-  name: "Biedronka"
+  name: "Classic theme"
   email: "pub@biedronka.pg.edu.pl"
   url: "https://localhost:8080"
 

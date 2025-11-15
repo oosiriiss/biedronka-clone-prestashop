@@ -55,6 +55,6 @@ services:
     volumes:
       # Use only if needed
       # - ../src/prestashop:/var/www/html
-      - ../src/biedronka-theme:/var/www/html/themes/biedronka
+      - ../src/biedronka:/var/www/html/themes/biedronka
 networks:
     prestashop_network:
