@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@source "../themes/biedronka/templates/**/*.tpl";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+* Source css file 
+*/
