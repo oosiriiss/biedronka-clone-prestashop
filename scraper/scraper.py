@@ -1,21 +1,14 @@
 import json
 import os
-from typing import List, Optional, Dict
 import aiohttp
 import asyncio
 import hashlib
-import requests
+import urllib.parse
 import aiofiles
 import re
 from bs4 import BeautifulSoup
 import logging
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
-
-
-"""
-    asynchronicznie przetwarza produkty
-"""
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -319,10 +312,6 @@ class AsyncBiedronkaScraper(AsyncScraper):
     
 
     async def download_images(self, item_html, session):
-        """
-        Pobiera wszystkie obrazy produktu (asynchronicznie) przy użyciu jednej sesji.
-        Zwraca listę lokalnych ścieżek.
-        """
         images_path = "data/images"
         os.makedirs(images_path, exist_ok=True)
 
@@ -343,9 +332,18 @@ class AsyncBiedronkaScraper(AsyncScraper):
                         print(f"Błąd pobierania {url}: {e}")
                 return filepath
 
+        def set_sw_sh(url, size=600):
+            """
+            Ustawia parametry sw i sh w URL na podaną wartość.
+            """
+            parsed = urllib.parse.urlparse(url)
+            query = urllib.parse.parse_qs(parsed.query)
+            query["sw"] = [str(size)]
+            query["sh"] = [str(size)]
+            new_query = urllib.parse.urlencode(query, doseq=True)
+            return urllib.parse.urlunparse(parsed._replace(query=new_query))
 
-
-        # Sprawdzenie sekcji miniaturek (synchronizowane)
+        # Sprawdzenie sekcji miniaturek
         thumbnails_exist = await self.check_selector_exists(item_html, "div.carousel-product-thumbnails")
 
         if not thumbnails_exist:
@@ -356,6 +354,7 @@ class AsyncBiedronkaScraper(AsyncScraper):
                 return [f"{images_path}/no_image.jpg"]
 
             src = self.get_attribute_of_tag(img_tag, "data-srcset")
+            src = set_sw_sh(src)
             image_name = hashlib.md5(src.encode("utf-8")).hexdigest() + ".jpg"
             await download_image(src, images_path, image_name)
             return [f"{images_path}/{image_name}"]
@@ -371,11 +370,13 @@ class AsyncBiedronkaScraper(AsyncScraper):
                 continue
 
             src = self.get_attribute_of_tag(img_tag, "data-srcset")
+            src = set_sw_sh(src)
             image_name = hashlib.md5(src.encode("utf-8")).hexdigest() + ".jpg"
             await download_image(src, images_path, image_name)
             paths.append(f"{images_path}/{image_name}")
 
         return paths
+
 
     
 
