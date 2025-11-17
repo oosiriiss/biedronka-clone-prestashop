@@ -55,6 +55,7 @@ python scraper.py
      * `price` – price
      * `packaging_details` – packaging
      * `description_sections` – product description sections
+     * 'absolute_path' - Contains "category/subcategory/subsubcategory/Product" where subsubcategories may not exit for some subcategory. Subcategory is always guaranteed to be existing
 
 3. **Download Images**
 
@@ -85,7 +86,8 @@ python scraper.py
            "price": "...",
            "packaging_details": "...",
            "description_sections": [...],
-           "images": ["data/images/xxx.jpg", "data/images/yyy.jpg"]
+           "images": ["data/images/xxx.jpg", "data/images/yyy.jpg"],
+           "absolute_path": "category/subcategory/subsubcategory/Product"
        },
        ...
    ]
