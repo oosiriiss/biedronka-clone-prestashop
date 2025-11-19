@@ -456,17 +456,50 @@ class AsyncBiedronkaScraper(AsyncScraper):
                 tasks = [asyncio.create_task(process_node(n)) for n in batch]
                 await asyncio.gather(*tasks)
 
+    async def get_all_categories_jsonl(self, output_file="categories.jsonl"):
+        categories = await self.get_categories()
+        all_categories = []
 
+        for cat in categories:
+            cat_dict = {
+                "name": cat["text"],
+                "parent": None
+            }
+            all_categories.append(cat_dict)
+            print(f"{cat_dict}")
+
+            subcats = await self.get_subcategories(cat["url"])
+            for sub in subcats:
+                sub_dict = {
+                    "name": sub["text"],
+                    "parent": cat["text"]
+                }
+                all_categories.append(sub_dict)
+                print(f"{sub_dict}")
+
+                subsubcats = await self.get_subsubcategories(sub["url"])
+                for subsub in subsubcats:
+                    subsub_dict = {
+                        "name": subsub["text"],
+                        "parent": sub["text"]
+                    }
+                    all_categories.append(subsub_dict)
+                    print(f"{subsub_dict}")
+
+        with open(output_file, "w", encoding="utf-8") as f:
+            for item in all_categories:
+                f.write(json.dumps(item, ensure_ascii=False) + "\n")
 
 
 async def main():
     scraper = AsyncBiedronkaScraper()
     # tree = await scraper.build_tree()
     # tree.save("page_tree.json")
-    scraper.tree = PageTree.load("page_tree.json")
+    #  scraper.tree = PageTree.load("page_tree.json")
 
 
-    await scraper.process_products_async()
+    # await scraper.process_products_async()
+    await scraper.get_all_categories_jsonl()
 
 asyncio.run(main())
 
