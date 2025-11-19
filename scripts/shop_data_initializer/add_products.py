@@ -32,13 +32,20 @@ def generate_link_rewrite(title):
     return unidecode.unidecode(title).lower().replace(" ", "-").replace("/", "-")
 
 
-def create_product_xml(product, category_id):
+def create_product_xml(product, category_id, product_index):
     """Tworzy XML dla produktu."""
     price = round(float(product['price'].replace(" PLN", "").replace(",", ".")) / 1.23, 2)
     link_rewrite = generate_link_rewrite(product['title'])
 
-    description = product.get('description_sections', [{}])[0].get('content', '')
-    subname = product.get('subname', '')
+    description_combined = ""
+    for section in product.get("description_sections", []):
+        header = section.get("header", "")
+        content = section.get("content", "")
+        if header or content:
+            description_combined += f"{header}: {content}\n"
+
+    # Usuwamy ostatni znak nowej linii
+    description_combined = description_combined.strip()
 
     xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -75,7 +82,7 @@ def create_product_xml(product, category_id):
       <language id="{LANG_ID}"><![CDATA[{product['title']}]]></language>
     </name>
     <description>
-      <language id="{LANG_ID}"><![CDATA[{product.get('description_sections', [{}])[0].get('content','') }]]></language>
+      <language id="{LANG_ID}"><![CDATA[{description_combined}]]></language>
     </description>
     <description_short>
       <language id="{LANG_ID}"><![CDATA[{product.get('subname','') }]]></language>
@@ -192,7 +199,10 @@ def create_product_with_stock(product, category_ids):
     update_stock_quantity(stock_id, product_id)
 
     for img_path in images_paths:
-        upload_product_image(product_id, "../../scraper/" + img_path)
+        if os.path.exists("../../scraper/" + img_path):
+            upload_product_image(product_id, "../../scraper/" + img_path)
+        else:
+            print(f"{product_id} nie znaleziono zdjecia ../../scraper/{img_path}!")
 
     return product_id
 

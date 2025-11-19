@@ -9,7 +9,7 @@ load_dotenv()
 
 PRESTASHOP_API_KEY = os.getenv("PRESTASHOP_API_KEY")
 API_URL = "http://localhost:8080/api"
-LANG_ID = 2
+LANG_ID = 1
 DEFAULT_PARENT_ID = 2 # Root
 CATEGORIES_FILE = "../../scraper/categories.jsonl"
 
