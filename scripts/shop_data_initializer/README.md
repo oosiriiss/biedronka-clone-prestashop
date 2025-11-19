@@ -20,3 +20,5 @@ Then paste your recently generated API key.
 **Make sure you are in scripts/shop_data_initialzer folder!**
 
 First, run add_categories.py, then add_products.py
+
+### REMEMBER TO DELETE THE KEY AFTER YOU FINISH ADDING PRODUCTS!
