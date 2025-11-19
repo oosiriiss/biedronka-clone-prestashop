@@ -1,9 +1,24 @@
 @import "tailwindcss";
 @source "../themes/biedronka/templates/**/*.tpl";
 @source "../themes/biedronka/assets/js/**/*.js";
+@source "../themes/biedronka/modules/**/*.tpl";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@layer base {
+
+	*,
+	*::before,
+	*::after {
+		padding: 0;
+		margin: 0;
+		box-sizing: border-box;
+	}
+
+}
+
 
 /**
 * Source css file 
@@ -11,5 +26,11 @@
 
 
 .card-soft {
-	@apply p-2 border-[rgba(0,0,0,0.1)] border-1;
+	@apply border-gray-100 border-1;
 }
+
+.header-delivery-button {
+	@apply flex items-center gap-2 border-gray-100 border-1 px-[12px] py-[8px] rounded-lg text-xs font-bold text-gray-800;
+}
+
+

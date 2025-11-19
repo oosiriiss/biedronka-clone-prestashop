@@ -19,10 +19,10 @@ document.addEventListener('DOMContentLoaded', (e) => {
       console.log("closebutton: ",closeButton)
 
       if(isOpening) {
-	 mobileMenu.classList.replace('max-w-0','max-w-2xl');
+	 // mobileMenu.classList.replace('max-w-0','max-w-2xl');
 	 openedPlaceholder.appendChild(closeButton);
       } else {
-	 mobileMenu.classList.replace('max-w-2xl','max-w-0');
+	 // mobileMenu.classList.replace('max-w-2xl','max-w-0');
 	 closedPlaceholder.appendChild(closeButton);
       }
    });
