@@ -17,6 +17,9 @@
 		box-sizing: border-box;
 	}
 
+    body {
+        @apply max-w-screen overflow-hidden;
+    }
 }
 
 
