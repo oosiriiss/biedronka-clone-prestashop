@@ -20,20 +20,20 @@ function toggleNavigationDrawer(drawer,closeButton,checkbox,openedPlaceholder,cl
     }
 }
 
-document.addEventListener('DOMContentLoaded', (e) => {
+document.addEventListener('DOMContentLoaded', (_) => {
    const mobileMenu = document.getElementById("mobile_menu");
    const closedPlaceholder = document.getElementById("mobile_menu_closed_placeholder");
    const openedPlaceholder = document.getElementById("mobile_menu_open_placeholder");
    const checkBox = document.getElementById("mobile_menu_close");
    const closeButton = checkBox.parentNode;
 
-   closeButton.addEventListener('change', (e) => {
+   closeButton.addEventListener('change', (_) => {
        toggleNavigationDrawer(mobileMenu,closeButton,checkBox,openedPlaceholder,closedPlaceholder);
    });
 
     const backgroundDim = document.getElementById("nav_drawer_dim");
 
-    backgroundDim.addEventListener('click', e =>{
+    backgroundDim.addEventListener('click', _ =>{
         toggleNavigationDrawer(mobileMenu,closeButton,checkBox,openedPlaceholder,closedPlaceholder);
     });
 })
