@@ -1,36 +1,49 @@
-version: '3'
+version: '3.8'
+
 services:
   mysql:
-    container_name: some-mysql
+    image: biedronka-mysql:latest
     build:
       context: ..
       dockerfile: docker/mysql/Dockerfile
-    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: toor
       MYSQL_DATABASE: prestashop
-    mem_limit: 1024M
-    cpus: '1.0'
+    networks:
+      - prestashop_network
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
     deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       resources:
         limits:
           cpus: '1.0'
           memory: 1024M
-    networks:
-      - prestashop_network
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
   prestashop:
-    container_name: prestashop
+    image: biedronka-prestashop:latest
     build:
       context: ..
       dockerfile: docker/prestashop/Dockerfile
-    restart: unless-stopped
     depends_on:
       - mysql
     ports:
-      - 8080:80
-      - 443:443
+      - target: 80
+        published: 8080
+        mode: host
+      - target: 443
+        published: 443
+        mode: host
     environment:
-      DB_SERVER: some-mysql
+      DB_SERVER: mysql
       DB_NAME: prestashop
       DB_USER: root
       DB_PASSWD: toor
@@ -44,19 +57,35 @@ services:
       ADMIN_PASSWD: password
       PS_FOLDER_ADMIN: admin-dev
       PS_FOLDER_INSTALL: install-dev
-    mem_limit: 1024M
-    cpus: '2.0'
+    networks:
+      - prestashop_network
+    volumes:
+      - ../src/themes/biedronka:/var/www/html/themes/biedronka
+      - ./certs:/etc/ssl/private:ro
+    restart: unless-stopped
     deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      rollback_config:
+        parallelism: 1
+        delay: 5s
       resources:
         limits:
           cpus: '2.0'
           memory: 1024M
-    networks:
-      - prestashop_network
-    volumes:
-      # Use only if needed
-      # - ../src/prestashop:/var/www/html
-      - ../src/themes/biedronka:/var/www/html/themes/biedronka
-      - ./certs:/etc/ssl/private:ro
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+volumes:
+  mysql_data:
+    driver: local
+
 networks:
-    prestashop_network:
+  prestashop_network:
+    driver: overlay
+    attachable: true
