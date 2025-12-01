@@ -16,6 +16,8 @@ Academic project developed for a university course. The goal is to create an e-c
   - PrestaShop: 1.7.8.10
   - MySQL: 5.7
 
+# Google Analitics is on projekty.pg0@gmail.com
+
 # Installation & Deployment
 
 This project supports **two deployment modes** using the same `docker-compose.yml` configuration:
