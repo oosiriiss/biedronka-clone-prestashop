@@ -28,6 +28,7 @@ services:
       - mysql
     ports:
       - 8080:80
+      - 443:443
     environment:
       DB_SERVER: some-mysql
       DB_NAME: prestashop
@@ -35,10 +36,10 @@ services:
       DB_PASSWD: toor
       PS_INSTALL_AUTO: 1
       PS_DEV_MODE: 1
-      PS_DOMAIN: localhost:8080
+      PS_DOMAIN: localhost
       PS_LANGUAGE: en
       PS_COUNTRY: us
-      PS_ENABLE_SSL: 0
+      PS_ENABLE_SSL: 1
       ADMIN_MAIL: makajler@szpont.pl
       ADMIN_PASSWD: password
       PS_FOLDER_ADMIN: admin-dev
@@ -56,5 +57,6 @@ services:
       # Use only if needed
       # - ../src/prestashop:/var/www/html
       - ../src/themes/biedronka:/var/www/html/themes/biedronka
+      - ./certs:/etc/ssl/private:ro
 networks:
     prestashop_network:
