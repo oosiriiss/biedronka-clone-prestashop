@@ -4,10 +4,11 @@
 
 This project supports **two deployment modes**:
 
-1. **Development mode** (`docker-compose up`) - Hot reload, easy debugging, single instance
+1. **Development mode** (`docker-compose up`) - Hot reload, fast startup, easy debugging
 2. **Production/Cluster mode** (`docker stack deploy`) - Swarm orchestration, load balancing, high availability
 
-Both modes use the **same `docker-compose.yml` file** for clean code.
+- **Development** uses `docker-compose.yml` (from `docker/` directory)
+- **Production** uses `docker-compose-prod.yml` (for Swarm cluster)
 
 ---
 
@@ -192,6 +193,7 @@ biedronka_prestashop      2/2        biedronka-prestashop:latest     *:8080->80/
 
 ```powershell
 # 1. Stop compose
+cd docker
 docker-compose down
 
 # 2. Init Swarm (if not already done)
@@ -202,7 +204,7 @@ docker build -t biedronka-mysql:latest -f mysql/Dockerfile ..
 docker build -t biedronka-prestashop:latest -f prestashop/Dockerfile ..
 
 # 4. Deploy stack
-docker stack deploy -c docker-compose.yml biedronka
+docker stack deploy -c docker-compose-prod.yml biedronka
 ```
 
 ### From Production to Development
@@ -215,6 +217,7 @@ docker stack rm biedronka
 # docker swarm leave --force
 
 # 3. Start compose
+cd docker
 docker-compose up -d
 ```
 
@@ -241,6 +244,7 @@ docker-compose up -d
 
 ```powershell
 # 1. Start environment (if not running)
+cd docker
 docker-compose up -d
 
 # 2. Edit theme files
@@ -259,13 +263,14 @@ docker-compose exec prestashop php bin/console cache:clear
 
 ```powershell
 # 1. Stop dev environment
+cd docker
 docker-compose down
 
 # 2. Deploy to Swarm
 docker swarm init  # if not already done
 docker build -t biedronka-mysql:latest -f mysql/Dockerfile ..
 docker build -t biedronka-prestashop:latest -f prestashop/Dockerfile ..
-docker stack deploy -c docker-compose.yml biedronka
+docker stack deploy -c docker-compose-prod.yml biedronka
 
 # 3. Test cluster functionality
 docker service ls
@@ -277,6 +282,7 @@ git commit -m "Feature complete"
 
 # 5. Return to dev mode
 docker stack rm biedronka
+cd docker
 docker-compose up -d
 ```
 

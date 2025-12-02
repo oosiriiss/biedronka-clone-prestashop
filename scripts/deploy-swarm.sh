@@ -5,7 +5,7 @@
 set -e
 
 STACK_NAME="biedronka"
-COMPOSE_FILE="docker/docker-compose.yml"
+COMPOSE_FILE="docker/docker-compose-prod.yml"
 ACTION="${1:-deploy}"
 REPLICAS="${2:-2}"
 

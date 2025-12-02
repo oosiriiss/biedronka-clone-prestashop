@@ -29,12 +29,13 @@ This project supports **two deployment modes** using the same `docker-compose.ym
 
 ## Development Mode (Recommended for Daily Work)
 
-Use `docker-compose` for daily development with hot reload and fast iteration.
+Use `docker-compose.yml` (in `docker/` directory) for daily development with hot reload and fast iteration.
 
 ### Quick Start
 
 ```powershell
-# Start environment
+# Start environment (from docker/ directory)
+cd docker
 docker-compose up -d
 
 # View logs
@@ -50,6 +51,7 @@ docker-compose down
 2. **Refresh browser** - changes apply immediately ✅
 3. **Clear cache** if needed:
    ```powershell
+   cd docker
    docker-compose exec prestashop php bin/console cache:clear
    ```
 
@@ -66,7 +68,7 @@ docker-compose down
 
 ## Production Mode (Cluster Deployment for Presentation)
 
-Use `docker stack deploy` to meet cluster requirements: shared database, load balancing, multiple replicas.
+Use `docker-compose-prod.yml` with `docker stack deploy` to meet cluster requirements: shared database, load balancing, multiple replicas.
 
 ### Prerequisites
 
@@ -112,7 +114,7 @@ docker build -t biedronka-mysql:latest -f mysql/Dockerfile ..
 docker build -t biedronka-prestashop:latest -f prestashop/Dockerfile ..
 
 # 3. Deploy stack
-docker stack deploy -c docker-compose.yml biedronka
+docker stack deploy -c docker-compose-prod.yml biedronka
 
 # 4. Check status
 docker stack services biedronka
@@ -170,9 +172,10 @@ docker stack services biedronka
 ### From Development to Production
 
 ```powershell
+cd docker
 docker-compose down
 docker swarm init  # if not already done
-.\scripts\deploy-swarm.ps1 -Action deploy
+.\..\scripts\deploy-swarm.ps1 -Action deploy
 ```
 
 ### From Production to Development
@@ -180,6 +183,7 @@ docker swarm init  # if not already done
 ```powershell
 docker stack rm biedronka
 # Wait 30 seconds for cleanup
+cd docker
 docker-compose up -d
 ```
 

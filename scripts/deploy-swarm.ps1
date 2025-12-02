@@ -13,7 +13,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $StackName = "biedronka"
-$ComposeFile = "docker/docker-compose.yml"
+$ComposeFile = "docker/docker-compose-prod.yml"
 
 function Write-Step {
     param([string]$Message)
