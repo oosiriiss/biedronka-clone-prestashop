@@ -1,0 +1,21 @@
+PrestaShop Backup Information
+=============================
+
+Backup Date: 2025-12-09
+PrestaShop Version: 1.7.8.10
+PHP Version: 7.4
+MySQL Version: 5.7/8.0
+
+Description:
+This backup contains complete PrestaShop shop settings and configuration.
+It enables full restoration in case of failure.
+
+Included Data:
+- Full database dump (prestashop_full.sql)
+- Shop configuration (ps_configuration.sql)
+- Modules configuration (ps_module.sql)
+- Theme files (src/themes/biedronka/)
+- SSL certificates (docker/certs/)
+
+Restore Instructions:
+See docs/BACKUP_RESTORE.md for detailed restoration steps.

@@ -189,6 +189,47 @@ docker-compose up -d
 
 ---
 
+## Backup & Restore
+
+### Create Backup
+
+Export all shop settings, database, and files:
+
+**Windows:**
+
+```powershell
+.\scripts\export-settings.ps1
+```
+
+**Linux/macOS:**
+
+```bash
+chmod +x scripts/export-settings.sh
+./scripts/export-settings.sh
+```
+
+Backup saved to: `backups/shop-backup-YYYYMMDD-HHMMSS/`
+
+### Restore Backup
+
+Restore shop from backup (disaster recovery):
+
+**Windows:**
+
+```powershell
+.\scripts\restore-settings.ps1 -BackupPath "backups\shop-backup-20251209-183045"
+```
+
+**Linux/macOS:**
+
+```bash
+./scripts/restore-settings.sh backups/shop-backup-20251209-183045
+```
+
+📖 **Full documentation:** See [docs/BACKUP_RESTORE.md](docs/BACKUP_RESTORE.md)
+
+---
+
 ## Legacy Installation (Not Recommended)
 
 ### Linux/macOS:
