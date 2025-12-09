@@ -57,15 +57,52 @@ if ($confirm -ne "yes") {
 # Restore database
 Write-Step "Restoring full database..."
 if (Test-Path "$BackupPath/database/prestashop_full.sql") {
+    # Verify SQL file is not empty
+    $sqlSize = (Get-Item "$BackupPath/database/prestashop_full.sql").Length
+    if ($sqlSize -lt 10000) {
+        Write-Error "Backup SQL file is too small ($sqlSize bytes) - backup corrupted!"
+        exit 1
+    }
+    
+    Write-Host "`n⚠️  This will DROP and RECREATE all database tables!" -ForegroundColor Yellow
+    Write-Host "SQL file size: $sqlSize bytes" -ForegroundColor Cyan
+    $restoreConfirm = Read-Host "Type 'RESTORE' to confirm"
+    
+    if ($restoreConfirm -ne "RESTORE") {
+        Write-Host "Database restore cancelled"
+        exit 0
+    }
+    
     Get-Content "$BackupPath/database/prestashop_full.sql" | docker exec -i $mysqlContainer mysql -uroot -ptoor prestashop
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to restore database!"
+        exit 1
+    }
     Write-Success "Database restored"
 } else {
     Write-Error "Database backup not found at $BackupPath/database/prestashop_full.sql"
     exit 1
 }
 
+# Restore Biedronka theme to HOST (volume mount)
+Write-Step "Restoring Biedronka theme to host (volume mount)..."
+
+if (Test-Path "$BackupPath/files/biedronka-theme") {
+    # Remove old theme completely
+    if (Test-Path "../src/themes/biedronka") {
+        Remove-Item "../src/themes/biedronka" -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    
+    # Copy entire biedronka-theme directory AS biedronka
+    Copy-Item "$BackupPath/files/biedronka-theme" "../src/themes/biedronka" -Recurse -Force
+    
+    Write-Success "Biedronka theme restored to ../src/themes/biedronka"
+} else {
+    Write-Host "⚠️  Biedronka theme not found in backup" -ForegroundColor Yellow
+}
+
 # Restore files to container
-Write-Step "Restoring files to PrestaShop container..."
+Write-Step "Restoring other files to PrestaShop container..."
 $prestashopContainer = docker ps -q -f "name=prestashop" | Select-Object -First 1
 
 if (-not $prestashopContainer) {
@@ -73,20 +110,14 @@ if (-not $prestashopContainer) {
     exit 1
 }
 
-# Restore themes
+# Restore other themes (Biedronka already on host)
 if (Test-Path "$BackupPath/files/themes") {
-    Write-Host "  → Restoring all themes..." -NoNewline
-    docker exec $prestashopContainer rm -rf /var/www/html/themes 2>$null
-    docker cp "$BackupPath/files/themes" "${prestashopContainer}:/var/www/html/"
-    Write-Host " ✓" -ForegroundColor Green
-}
-
-# Restore Biedronka theme (fallback)
-if (Test-Path "$BackupPath/files/biedronka-theme") {
-    Write-Host "  → Restoring Biedronka theme..." -NoNewline
+    Write-Host "  → Restoring classic and other themes..." -NoNewline
+    # Copy classic theme (skip biedronka - it's mounted from host)
     docker exec $prestashopContainer mkdir -p /var/www/html/themes 2>$null
-    docker cp "$BackupPath/files/biedronka-theme" "${prestashopContainer}:/var/www/html/themes/biedronka"
+    docker cp "$BackupPath/files/themes/classic" "${prestashopContainer}:/var/www/html/themes/" 2>$null
     Write-Host " ✓" -ForegroundColor Green
+    Write-Host "  → Biedronka theme: using host volume mount" -ForegroundColor Yellow
 }
 
 # Restore images

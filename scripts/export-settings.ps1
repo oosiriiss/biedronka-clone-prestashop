@@ -49,10 +49,26 @@ Write-Success "Containers are running"
 
 # Backup database
 Write-Step "Exporting full database..."
-docker exec $mysqlContainer mysqldump -uroot -ptoor prestashop 2>$null > "$BackupDir/database/prestashop_full.sql"
-Write-Success "Full database exported"
+docker exec $mysqlContainer mysqldump -uroot -ptoor prestashop > "$BackupDir/database/prestashop_full.sql"
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed to export database - mysqldump failed!"
+    exit 1
+}
+
+# Verify backup is not empty
+$sqlSize = (Get-Item "$BackupDir/database/prestashop_full.sql").Length
+if ($sqlSize -lt 10000) {
+    Write-Error "Database backup is too small ($sqlSize bytes) - export failed!"
+    exit 1
+}
+
+$lines = (Get-Content "$BackupDir/database/prestashop_full.sql").Count
+Write-Success "Full database exported ($sqlSize bytes, $lines lines)"
 
 Write-Step "Exporting configuration tables..."
+docker exec $mysqlContainer mysqldump -uroot -ptoor prestashop ps_configuration > "$BackupDir/database/ps_configuration.sql"
+docker exec $mysqlContainer mysqldump -uroot -ptoor prestashop ps_module > "$BackupDir/database/ps_module.sql"
+docker exec $mysqlContainer mysqldump -uroot -ptoor prestashop ps_carrier > "$BackupDir/database/ps_carrier.sql"
 docker exec $mysqlContainer mysqldump -uroot -ptoor prestashop ps_configuration 2>$null > "$BackupDir/database/ps_configuration.sql"
 docker exec $mysqlContainer mysqldump -uroot -ptoor prestashop ps_module 2>$null > "$BackupDir/database/ps_module.sql"
 docker exec $mysqlContainer mysqldump -uroot -ptoor prestashop ps_carrier 2>$null > "$BackupDir/database/ps_carrier.sql"

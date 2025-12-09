@@ -57,34 +57,61 @@ fi
 # Restore database
 print_step "Restoring full database..."
 if [ -f "$BACKUP_PATH/database/prestashop_full.sql" ]; then
+    # Verify SQL file is not empty
+    SQL_SIZE=$(wc -c < "$BACKUP_PATH/database/prestashop_full.sql")
+    if [ $SQL_SIZE -lt 10000 ]; then
+        print_error "Backup SQL file is too small ($SQL_SIZE bytes) - backup corrupted!"
+    fi
+    
+    echo -e "${YELLOW}⚠️  This will DROP and RECREATE all database tables!${NC}"
+    echo "SQL file size: $SQL_SIZE bytes"
+    read -p "Type 'RESTORE' to confirm: " RESTORE_CONFIRM
+    
+    if [ "$RESTORE_CONFIRM" != "RESTORE" ]; then
+        echo "Database restore cancelled"
+        exit 0
+    fi
+    
     docker exec -i $MYSQL_CONTAINER mysql -uroot -ptoor prestashop < "$BACKUP_PATH/database/prestashop_full.sql"
+    if [ $? -ne 0 ]; then
+        print_error "Failed to restore database!"
+    fi
     print_success "Database restored"
 else
     print_error "Database backup not found at $BACKUP_PATH/database/prestashop_full.sql"
 fi
 
+# Restore Biedronka theme to HOST (volume mount)
+print_step "Restoring Biedronka theme to host (volume mount)..."
+
+if [ -d "$BACKUP_PATH/files/biedronka-theme" ]; then
+    # Remove old theme completely
+    rm -rf ../src/themes/biedronka 2>/dev/null
+    
+    # Copy entire biedronka-theme directory AS biedronka
+    cp -r "$BACKUP_PATH/files/biedronka-theme" ../src/themes/biedronka
+    
+    print_success "Biedronka theme restored to ../src/themes/biedronka"
+else
+    echo -e "${YELLOW}⚠️  Biedronka theme not found in backup${NC}"
+fi
+
 # Restore files to container
-print_step "Restoring files to PrestaShop container..."
+print_step "Restoring other files to PrestaShop container..."
 PRESTASHOP_CONTAINER=$(docker ps -q -f "name=prestashop" | head -1)
 
 if [ -z "$PRESTASHOP_CONTAINER" ]; then
     print_error "PrestaShop container not running. Start with: cd docker && docker-compose up -d"
 fi
 
-# Restore themes
+# Restore other themes (Biedronka already on host)
 if [ -d "$BACKUP_PATH/files/themes" ]; then
-    echo "  → Restoring all themes..."
-    docker exec $PRESTASHOP_CONTAINER rm -rf /var/www/html/themes 2>/dev/null
-    docker cp "$BACKUP_PATH/files/themes" $PRESTASHOP_CONTAINER:/var/www/html/
-    echo -e "    ${GREEN}✓${NC} Themes restored"
-fi
-
-# Restore Biedronka theme (fallback)
-if [ -d "$BACKUP_PATH/files/biedronka-theme" ]; then
-    echo "  → Restoring Biedronka theme..."
+    echo "  → Restoring classic and other themes..."
+    # Copy classic theme (skip biedronka - it's mounted from host)
     docker exec $PRESTASHOP_CONTAINER mkdir -p /var/www/html/themes 2>/dev/null
-    docker cp "$BACKUP_PATH/files/biedronka-theme" $PRESTASHOP_CONTAINER:/var/www/html/themes/biedronka
-    echo -e "    ${GREEN}✓${NC} Biedronka theme restored"
+    docker cp "$BACKUP_PATH/files/themes/classic" $PRESTASHOP_CONTAINER:/var/www/html/themes/ 2>/dev/null
+    echo -e "    ${GREEN}✓${NC} Other themes restored"
+    echo -e "    ${YELLOW}→${NC} Biedronka theme: using host volume mount"
 fi
 
 # Restore images

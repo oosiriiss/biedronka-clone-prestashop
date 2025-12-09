@@ -1,3 +1,4 @@
+<!-- docker exec -it some-mysql mysql -uroot -ptoor prestashop -e "DROP TABLE ps_configuration;" -->
 # Backup & Restore Guide
 
 Complete guide for backing up and restoring PrestaShop shop settings.
