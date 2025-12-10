@@ -1,5 +1,3 @@
-
-
 import requests
 import json
 import xml.etree.ElementTree as ET
@@ -8,8 +6,8 @@ import os
 import random  
 
 API_URL = 'https://localhost:443/api'
-# Wygeneorwane w Admin panel -> Advanced parameters -> Webservice
-API_KEY = '51VR8T48Q9QRPFLVC7CIX3R4AWI8DTAN'  
+# wygenerowane w panelu, klucz ma full uprawnienia
+API_KEY = 'DBV8CNPPZLBCCREL5PHLQECG5AN9PSHY'  
 DEBUG = True
 
 class PrestaShopImporter:
@@ -17,31 +15,33 @@ class PrestaShopImporter:
         self.api_url = api_url
         self.session = requests.Session()
         self.session.auth = (api_key, '')
-        self.session.verify = False  # Bez ssl
+        self.session.verify = False  # wylaczamy weryfikacje ssl bo na localhost sypie bledami
         
-        # wylaczenie ostrzezenia
+        # zeby nie spamowalo warningami o braku certyfikatu
         import urllib3
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         
+        # cache zeby nie meczyc api ciagle tymi samymi zapytaniami o kategorie/cechy
         self.category_cache = {} 
         self.features_cache = {} 
         self.feature_values_cache = {} 
 
     def _get_schema(self, resource) -> ET.Element:
-        """pobiera schemat XML"""
+        """pobiera pusty szablon xml dla danego zasobu"""
         url = f"{self.api_url}/{resource}?schema=blank"
         response = self.session.get(url)
         if response.status_code != 200:
-            raise Exception(f"Błąd pobierania schematu dla {resource}: {response.text}")
+            raise Exception(f"cos poszlo nie tak przy schemacie {resource}: {response.text}")
         return ET.fromstring(response.content)
 
     def _slugify(self, text):
+        # robimy slug do url, zamiana spacji na myslniki i wywalenie dziwnych znakow
         text = text.lower()
         text = re.sub(r'[^a-z0-9]+', '-', text).strip('-')
         return text if text else 'produkt'
 
     def get_or_create_feature(self, name):
-        """Zwraca ID feature o danej nazwie lub tworzy feautre"""
+        """sprawdza czy cecha jest, jak nie to tworzy. cache przyspiesza sprawe"""
         if name in self.features_cache:
             return self.features_cache[name]
 
@@ -62,7 +62,7 @@ class PrestaShopImporter:
         return None
 
     def get_or_create_feature_value(self, feature_id, value_text):
-        """Zwraca ID wartości feature"""
+        """to samo co wyzej tylko dla wartosci cech"""
         if feature_id in self.feature_values_cache:
             if value_text in self.feature_values_cache[feature_id]:
                 return self.feature_values_cache[feature_id][value_text]
@@ -93,7 +93,7 @@ class PrestaShopImporter:
             return self.category_cache[name]
 
         print(f"Tworzenie kategorii: {name}")
-        parent_id = 2
+        parent_id = 2 # domyslnie home category
         if parent_name and parent_name in self.category_cache:
             parent_id = self.category_cache[parent_name]
 
@@ -104,6 +104,7 @@ class PrestaShopImporter:
         category.find('link_rewrite').find('language').text = self._slugify(name)
         category.find('name').find('language').text = name
         
+        # wywalamy pozycje, presta sama to sobie ustawi
         pos = category.find('position')
         if pos is not None: category.remove(pos)
 
@@ -116,14 +117,16 @@ class PrestaShopImporter:
         return None
 
     def create_product(self, product_data):
-        print(f"Dodawanie produktu: {product_data.get('name', 'Bez nazwy')}")
+        print(f"Dodawanie produktu: {product_data.get('title', 'Bez nazwy')}")
         
+        # ustalamy sciezke kategori, jak cos to wrzucamy do glownej
         cat_path = product_data.get('absolute_path', '').split('/')
         category_id = 2 
         if len(cat_path) > 1:
             cat_name = cat_path[-2]
             category_id = self.category_cache.get(cat_name, 2)
 
+        # cena przychodzi brudna ze stringa, trzeba wyczyscic smieci
         price_raw = product_data.get('price', '0').replace(' PLN', '').replace(' zł', '').replace(',', '.').strip()
         try:
             price = float(price_raw)
@@ -138,15 +141,20 @@ class PrestaShopImporter:
             product.remove(position_node)
 
         product.find('price').text = str(price)
-        product.find('active').text = '1'
+        product.find('active').text = '1' # od razu widoczny
         product.find('state').text = '1'
+
+        product.find('available_for_order').text = '1' # Włącza możliwość zamawiania
+        product.find('show_price').text = '1'          # Włącza pokazywanie ceny
+
         product.find('id_category_default').text = str(category_id)
         product.find('id_tax_rules_group').text = '1' 
         product.find('type').text = 'simple'
         
-        product.find('name').find('language').text = product_data.get('name', 'Produkt')
-        product.find('link_rewrite').find('language').text = self._slugify(product_data.get('name', 'produkt'))
+        product.find('name').find('language').text = product_data.get('title', 'bez nazwy')
+        product.find('link_rewrite').find('language').text = self._slugify(product_data.get('title', 'produkt'))
         
+        # budowanie opisu z kawalkow html
         desc_html = ""
         for section in product_data.get('description_sections', []):
             desc_html += f"<h3>{section.get('header','')}</h3><p>{section.get('content','')}</p>"
@@ -154,18 +162,21 @@ class PrestaShopImporter:
 
         features_to_add = {}
         
+        # mapowanie pol z jsona na featurey w prescie
         if 'brand' in product_data and product_data['brand']:
             features_to_add['Marka'] = product_data['brand']
             
         if 'packaging_details' in product_data and product_data['packaging_details']:
             features_to_add['Opakowanie'] = product_data['packaging_details']
 
+        # jesli sa jakies cechy to trzeba je podpiac pod xml
         if features_to_add:
             associations = product.find('associations')
             pf_node = associations.find('product_features')
             if pf_node is None:
                 pf_node = ET.SubElement(associations, 'product_features')
             
+            # czyscimy stare wpisy z szablonu
             for child in list(pf_node): pf_node.remove(child)
 
             for f_name, f_value_text in features_to_add.items():
@@ -177,12 +188,14 @@ class PrestaShopImporter:
                         ET.SubElement(feature_node, 'id').text = str(f_id)
                         ET.SubElement(feature_node, 'id_feature_value').text = str(v_id)
 
+        # podpiecie kategori do produktu zeby byl widoczny w liscie
         associations = product.find('associations')
         categories_node = associations.find('categories')
         for child in list(categories_node): categories_node.remove(child)
         cat_node = ET.SubElement(categories_node, 'category')
         ET.SubElement(cat_node, 'id').text = str(category_id)
 
+        # wlasciwy request post
         response = self.session.post(f"{self.api_url}/products", data=ET.tostring(root))
         
         if response.status_code != 201:
@@ -193,6 +206,7 @@ class PrestaShopImporter:
         product_id = new_xml.find('product/id').text
         print(f" -> Sukces! ID: {product_id}")
 
+        # losowanie ilosci 
         if random.random() < 0.20:
             qty = 0
             print(" -> Stan magazynowy: BRAK (wylosowano 0)")
@@ -202,6 +216,7 @@ class PrestaShopImporter:
             
         self._update_stock(product_id, qty)
 
+        # upload zdjec
         if 'images' in product_data:
             for img_path in product_data['images']:
                 self._upload_image(product_id, os.path.join('../scraper/',img_path))
@@ -222,12 +237,14 @@ class PrestaShopImporter:
             
             stock_node.find('quantity').text = str(quantity)
             
+            # wazne zeby wylaczyc zaleznosc od magazynu glownego
             if stock_node.find('depends_on_stock') is not None:
                 stock_node.find('depends_on_stock').text = '0'
             else:
                 dos = ET.SubElement(stock_node, 'depends_on_stock')
                 dos.text = '0'
             
+            # trzeba opakowac w element prestashop przy update 
             new_root = ET.Element('prestashop')
             new_root.set('xmlns:xlink', "http://www.w3.org/1999/xlink")
             new_root.append(stock_node)
@@ -260,6 +277,7 @@ if os.path.exists('../scraper/categories.jsonl'):
             importer.create_category(data['name'], data['parent'])
 
 print("--- Import Produktów ---")
+
 if os.path.exists('../scraper/products.jsonl'):
     with open('../scraper/products.jsonl', 'r', encoding='utf-8') as f:
         for line in f:
