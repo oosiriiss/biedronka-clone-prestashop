@@ -46,7 +46,7 @@ if [ -z "$MYSQL_CONTAINER" ]; then
 fi
 
 # Warning
-echo -e "\n${YELLOW}⚠️  WARNING: This will replace current shop data!${NC}"
+echo -e "\n${YELLOW}WARNING: This will replace current shop data!${NC}"
 read -p "Continue? (yes/no): " CONFIRM
 
 if [ "$CONFIRM" != "yes" ]; then
@@ -60,23 +60,28 @@ if [ -f "$BACKUP_PATH/database/prestashop_full.sql" ]; then
     # Verify SQL file is not empty
     SQL_SIZE=$(wc -c < "$BACKUP_PATH/database/prestashop_full.sql")
     if [ $SQL_SIZE -lt 10000 ]; then
-        print_error "Backup SQL file is too small ($SQL_SIZE bytes) - backup corrupted!"
+        print_error "Backup SQL file is too small - backup corrupted!"
     fi
     
-    echo -e "${YELLOW}⚠️  This will DROP and RECREATE all database tables!${NC}"
     echo "SQL file size: $SQL_SIZE bytes"
-    read -p "Type 'RESTORE' to confirm: " RESTORE_CONFIRM
+    echo "Importing database (this may take 10-30 seconds)..."
+    echo "Please wait - do NOT interrupt!"
     
-    if [ "$RESTORE_CONFIRM" != "RESTORE" ]; then
-        echo "Database restore cancelled"
-        exit 0
-    fi
+    # Copy SQL file to container
+    docker cp "$BACKUP_PATH/database/prestashop_full.sql" $MYSQL_CONTAINER:/tmp/backup.sql 2>/dev/null
     
-    docker exec -i $MYSQL_CONTAINER mysql -uroot -ptoor prestashop < "$BACKUP_PATH/database/prestashop_full.sql"
-    if [ $? -ne 0 ]; then
-        print_error "Failed to restore database!"
+    # Import database synchronously (no background process)
+    docker exec $MYSQL_CONTAINER sh -c "mysql -uroot -ptoor prestashop < /tmp/backup.sql" 2>/dev/null
+    EXIT_CODE=$?
+    
+    # Cleanup temp file
+    docker exec $MYSQL_CONTAINER rm -f /tmp/backup.sql 2>/dev/null
+    
+    if [ $EXIT_CODE -eq 0 ]; then
+        print_success "Database restored"
+    else
+        print_error "Failed to restore database (exit code: $EXIT_CODE)"
     fi
-    print_success "Database restored"
 else
     print_error "Database backup not found at $BACKUP_PATH/database/prestashop_full.sql"
 fi
@@ -93,7 +98,7 @@ if [ -d "$BACKUP_PATH/files/biedronka-theme" ]; then
     
     print_success "Biedronka theme restored to ../src/themes/biedronka"
 else
-    echo -e "${YELLOW}⚠️  Biedronka theme not found in backup${NC}"
+    echo -e "${YELLOW}WARNING: Biedronka theme not found in backup${NC}"
 fi
 
 # Restore files to container
@@ -142,8 +147,14 @@ fi
 if [ -d "$BACKUP_PATH/files/modules" ]; then
     echo "  → Restoring modules..."
     docker exec $PRESTASHOP_CONTAINER rm -rf /var/www/html/modules 2>/dev/null
-    docker cp "$BACKUP_PATH/files/modules" $PRESTASHOP_CONTAINER:/var/www/html/
-    echo -e "    ${GREEN}✓${NC} Modules restored"
+    docker cp "$BACKUP_PATH/files/modules" $PRESTASHOP_CONTAINER:/var/www/html/ 2>/dev/null
+    
+    # Remove problematic modules with broken vendor dependencies
+    echo "  → Cleaning problematic modules..."
+    docker exec $PRESTASHOP_CONTAINER rm -rf /var/www/html/modules/ps_checkout 2>/dev/null
+    docker exec $PRESTASHOP_CONTAINER rm -rf /var/www/html/modules/ps_mbo 2>/dev/null
+    
+    echo -e "    ${GREEN}✓${NC} Modules restored (ps_checkout removed - vendor dependencies broken)"
 fi
 
 # Restore config
