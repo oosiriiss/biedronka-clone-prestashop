@@ -4,3 +4,6 @@ tests/venv/*
 __pycache__/
 .DS_Store
 .vscode/
+scripts/backups/*
+.venv
+.env

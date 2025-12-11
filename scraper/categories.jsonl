@@ -1,0 +1,260 @@
+{"name": "Warzywa", "parent": null}
+{"name": "Warzywa świeże", "parent": "Warzywa"}
+{"name": "Sałaty", "parent": "Warzywa"}
+{"name": "Zioła", "parent": "Warzywa"}
+{"name": "Grzyby", "parent": "Warzywa"}
+{"name": "Owoce", "parent": null}
+{"name": "Owoce świeże", "parent": "Owoce"}
+{"name": "Piekarnia", "parent": null}
+{"name": "Bułki", "parent": "Piekarnia"}
+{"name": "Chleb", "parent": "Piekarnia"}
+{"name": "Bagietki", "parent": "Piekarnia"}
+{"name": "Pieczywo tostowe", "parent": "Piekarnia"}
+{"name": "Do hot-dogów i burgerów", "parent": "Piekarnia"}
+{"name": "Wypieki", "parent": "Piekarnia"}
+{"name": "Wypieki słone", "parent": "Wypieki"}
+{"name": "Wypieki słodkie", "parent": "Wypieki"}
+{"name": "Pieczywo chrupkie i tortille", "parent": "Wypieki"}
+{"name": "Nabiał", "parent": null}
+{"name": "Sery", "parent": "Nabiał"}
+{"name": "Sery żółte", "parent": "Sery"}
+{"name": "Sery pleśniowe", "parent": "Sery"}
+{"name": "Sery białe", "parent": "Sery"}
+{"name": "Twarogi", "parent": "Sery"}
+{"name": "Inne sery", "parent": "Sery"}
+{"name": "Masło", "parent": "Nabiał"}
+{"name": "Margaryna", "parent": "Nabiał"}
+{"name": "Mleko", "parent": "Nabiał"}
+{"name": "Śmietana", "parent": "Nabiał"}
+{"name": "Maślanki", "parent": "Nabiał"}
+{"name": "Kefiry", "parent": "Nabiał"}
+{"name": "Jogurty naturalne", "parent": "Nabiał"}
+{"name": "Jogurty owocowe", "parent": "Nabiał"}
+{"name": "Jogurty pitne", "parent": "Nabiał"}
+{"name": "Jogurty vege", "parent": "Nabiał"}
+{"name": "Serki", "parent": "Nabiał"}
+{"name": "Desery", "parent": "Nabiał"}
+{"name": "Jaja", "parent": "Nabiał"}
+{"name": "Mięso", "parent": null}
+{"name": "Drób", "parent": "Mięso"}
+{"name": "Kurczak", "parent": "Drób"}
+{"name": "Kaczka", "parent": "Drób"}
+{"name": "Indyk", "parent": "Drób"}
+{"name": "Wieprzowina", "parent": "Mięso"}
+{"name": "Wołowina", "parent": "Mięso"}
+{"name": "Steki", "parent": "Wołowina"}
+{"name": "Kiełbasy", "parent": "Mięso"}
+{"name": "Kiełbasy białe i grillowe", "parent": "Kiełbasy"}
+{"name": "Kiełbasy mięsne", "parent": "Kiełbasy"}
+{"name": "Kabanosy", "parent": "Mięso"}
+{"name": "Parówki", "parent": "Mięso"}
+{"name": "Parówki mięsne", "parent": "Parówki"}
+{"name": "Wędliny", "parent": "Mięso"}
+{"name": "Wędliny w plastrach", "parent": "Wędliny"}
+{"name": "Szynki", "parent": "Mięso"}
+{"name": "Szynki drobiowe", "parent": "Szynki"}
+{"name": "Salami", "parent": "Mięso"}
+{"name": "Bekon", "parent": "Mięso"}
+{"name": "Ryby", "parent": "Mięso"}
+{"name": "Ryby świeże", "parent": "Ryby"}
+{"name": "Śledzie", "parent": "Ryby"}
+{"name": "Ryby marynowane", "parent": "Ryby"}
+{"name": "Ryby wędzone", "parent": "Ryby"}
+{"name": "Dania Gotowe", "parent": null}
+{"name": "Dania obiadowe", "parent": "Dania Gotowe"}
+{"name": "Pierogi i kluski", "parent": "Dania obiadowe"}
+{"name": "Dania włoskie", "parent": "Dania obiadowe"}
+{"name": "Hyperfood", "parent": "Dania obiadowe"}
+{"name": "Dania inne", "parent": "Dania obiadowe"}
+{"name": "Dania mrożone", "parent": "Dania Gotowe"}
+{"name": "Pizza", "parent": "Dania mrożone"}
+{"name": "Frytki", "parent": "Dania mrożone"}
+{"name": "Inne dania", "parent": "Dania mrożone"}
+{"name": "Surówki i sałatki", "parent": "Dania Gotowe"}
+{"name": "Lunchboxy", "parent": "Surówki i sałatki"}
+{"name": "Sałatki", "parent": "Surówki i sałatki"}
+{"name": "Pasty", "parent": "Surówki i sałatki"}
+{"name": "Napoje", "parent": null}
+{"name": "Gazowane", "parent": "Napoje"}
+{"name": "Niegazowane", "parent": "Napoje"}
+{"name": "Owocowe", "parent": "Napoje"}
+{"name": "Bezalkoholowe", "parent": "Napoje"}
+{"name": "Soki", "parent": "Napoje"}
+{"name": "Soki owocowe 100%", "parent": "Soki"}
+{"name": "Soki świeże", "parent": "Soki"}
+{"name": "Soczki", "parent": "Soki"}
+{"name": "Nektary", "parent": "Napoje"}
+{"name": "Syropy", "parent": "Napoje"}
+{"name": "Woda", "parent": "Napoje"}
+{"name": "Gazowana", "parent": "Woda"}
+{"name": "Niegazowana", "parent": "Woda"}
+{"name": "Mrożone", "parent": null}
+{"name": "Mrożone warzywa", "parent": "Mrożone"}
+{"name": "Mrożone owoce", "parent": "Mrożone"}
+{"name": "Mrożone ryby", "parent": "Mrożone"}
+{"name": "Paluszki rybne", "parent": "Mrożone ryby"}
+{"name": "Lody", "parent": "Mrożone"}
+{"name": "Artykuły spożywcze", "parent": null}
+{"name": "Produkty w słoikach", "parent": "Artykuły spożywcze"}
+{"name": "Majonez", "parent": "Produkty w słoikach"}
+{"name": "Musztarda", "parent": "Produkty w słoikach"}
+{"name": "Chrzan", "parent": "Produkty w słoikach"}
+{"name": "Miód", "parent": "Produkty w słoikach"}
+{"name": "Dżem", "parent": "Produkty w słoikach"}
+{"name": "Kremy do smarowania", "parent": "Produkty w słoikach"}
+{"name": "Mięso w słoiku", "parent": "Produkty w słoikach"}
+{"name": "Promocje", "parent": "Artykuły spożywcze"}
+{"name": "Produkty z pomidorów", "parent": "Artykuły spożywcze"}
+{"name": "Ketchup", "parent": "Produkty z pomidorów"}
+{"name": "Przeciery i koncentraty", "parent": "Produkty z pomidorów"}
+{"name": "Produkty roślinne", "parent": "Artykuły spożywcze"}
+{"name": "Wędliny vege", "parent": "Produkty roślinne"}
+{"name": "Jogurty vege", "parent": "Produkty roślinne"}
+{"name": "Produkty vege", "parent": "Produkty roślinne"}
+{"name": "Napoje", "parent": "Produkty roślinne"}
+{"name": "Produkty konserwowe", "parent": "Artykuły spożywcze"}
+{"name": "Konserwy mięsne", "parent": "Produkty konserwowe"}
+{"name": "Konserwy rybne", "parent": "Produkty konserwowe"}
+{"name": "Pasztety", "parent": "Produkty konserwowe"}
+{"name": "Zakwasy", "parent": "Produkty konserwowe"}
+{"name": "Warzywa i owoce konserwowe", "parent": "Produkty konserwowe"}
+{"name": "Sushi", "parent": "Artykuły spożywcze"}
+{"name": "Przekąski", "parent": "Artykuły spożywcze"}
+{"name": "Chipsy", "parent": "Przekąski"}
+{"name": "Orzeszki", "parent": "Przekąski"}
+{"name": "Bakalie", "parent": "Przekąski"}
+{"name": "Słone przekąski", "parent": "Artykuły spożywcze"}
+{"name": "Krakersy", "parent": "Słone przekąski"}
+{"name": "Paluszki", "parent": "Słone przekąski"}
+{"name": "Popcorn", "parent": "Słone przekąski"}
+{"name": "Słodycze", "parent": "Artykuły spożywcze"}
+{"name": "Ciastka", "parent": "Słodycze"}
+{"name": "Biszkopty", "parent": "Słodycze"}
+{"name": "Wafelki", "parent": "Słodycze"}
+{"name": "Wafle", "parent": "Słodycze"}
+{"name": "Batony", "parent": "Słodycze"}
+{"name": "Czekolady", "parent": "Słodycze"}
+{"name": "Bombonierki", "parent": "Słodycze"}
+{"name": "Ciasta", "parent": "Słodycze"}
+{"name": "Cukierki", "parent": "Słodycze"}
+{"name": "Żelki", "parent": "Słodycze"}
+{"name": "Orzeszki w czekoladzie", "parent": "Słodycze"}
+{"name": "Gumy do żucia", "parent": "Słodycze"}
+{"name": "Produkty sypkie", "parent": "Artykuły spożywcze"}
+{"name": "Cukier", "parent": "Produkty sypkie"}
+{"name": "Mąka", "parent": "Produkty sypkie"}
+{"name": "Makaron", "parent": "Produkty sypkie"}
+{"name": "Kasza", "parent": "Produkty sypkie"}
+{"name": "Ryż", "parent": "Produkty sypkie"}
+{"name": "Płatki śniadaniowe", "parent": "Produkty sypkie"}
+{"name": "Produkty w proszku", "parent": "Artykuły spożywcze"}
+{"name": "Budyń", "parent": "Produkty w proszku"}
+{"name": "Kisiel", "parent": "Produkty w proszku"}
+{"name": "Dania w proszku", "parent": "Produkty w proszku"}
+{"name": "Do smażenia i wypieków", "parent": "Artykuły spożywcze"}
+{"name": "Ciasto", "parent": "Do smażenia i wypieków"}
+{"name": "Galaretki", "parent": "Do smażenia i wypieków"}
+{"name": "Olej", "parent": "Do smażenia i wypieków"}
+{"name": "Oliwa", "parent": "Do smażenia i wypieków"}
+{"name": "Ocet i smalec", "parent": "Do smażenia i wypieków"}
+{"name": "Dodatki do ciast", "parent": "Do smażenia i wypieków"}
+{"name": "Gotowe mieszanki", "parent": "Do smażenia i wypieków"}
+{"name": "Sosy", "parent": "Artykuły spożywcze"}
+{"name": "Sosy majonezowe", "parent": "Sosy"}
+{"name": "Pesto", "parent": "Sosy"}
+{"name": "Sosy w proszku", "parent": "Sosy"}
+{"name": "Sosy gotowe", "parent": "Sosy"}
+{"name": "Sosy sałatkowe", "parent": "Sosy"}
+{"name": "Sosy słodkie", "parent": "Sosy"}
+{"name": "Przyprawy", "parent": "Artykuły spożywcze"}
+{"name": "Pieprz", "parent": "Przyprawy"}
+{"name": "Sól", "parent": "Przyprawy"}
+{"name": "Przyprawy", "parent": "Przyprawy"}
+{"name": "Bulion", "parent": "Przyprawy"}
+{"name": "Herbaty", "parent": "Artykuły spożywcze"}
+{"name": "Herbata czarna", "parent": "Herbaty"}
+{"name": "Herbata zielona", "parent": "Herbaty"}
+{"name": "Earl Grey", "parent": "Herbaty"}
+{"name": "Herbata owocowa", "parent": "Herbaty"}
+{"name": "Kawy", "parent": "Artykuły spożywcze"}
+{"name": "Kawa rozpuszczalna", "parent": "Kawy"}
+{"name": "Kawa mielona", "parent": "Kawy"}
+{"name": "Kawa ziarnista", "parent": "Kawy"}
+{"name": "Drogeria", "parent": null}
+{"name": "Pielęgnacja ciała", "parent": "Drogeria"}
+{"name": "Balsamy, mleczka i kremy do ciała", "parent": "Pielęgnacja ciała"}
+{"name": "Żele i peelingi", "parent": "Pielęgnacja ciała"}
+{"name": "Mydło", "parent": "Pielęgnacja ciała"}
+{"name": "Pielęgnacja stóp", "parent": "Pielęgnacja ciała"}
+{"name": "Pielęgnacja ciała dla dzieci", "parent": "Drogeria"}
+{"name": "Kąpiel", "parent": "Pielęgnacja ciała dla dzieci"}
+{"name": "Dezodoranty", "parent": "Drogeria"}
+{"name": "Dezodoranty damskie", "parent": "Dezodoranty"}
+{"name": "Dezodoranty męskie", "parent": "Dezodoranty"}
+{"name": "Pielęgnacja twarzy", "parent": "Drogeria"}
+{"name": "Kremy", "parent": "Pielęgnacja twarzy"}
+{"name": "Oczyszczanie twarzy", "parent": "Pielęgnacja twarzy"}
+{"name": "Pielęgnacja włosów", "parent": "Drogeria"}
+{"name": "Szampony", "parent": "Pielęgnacja włosów"}
+{"name": "Odżywki i olejki", "parent": "Pielęgnacja włosów"}
+{"name": "Do stylizacji", "parent": "Pielęgnacja włosów"}
+{"name": "Higiena osobista", "parent": "Drogeria"}
+{"name": "Higiena intymna", "parent": "Higiena osobista"}
+{"name": "Podpaski", "parent": "Higiena osobista"}
+{"name": "Wkładki", "parent": "Higiena osobista"}
+{"name": "Tampony", "parent": "Higiena osobista"}
+{"name": "Prezerwatywy i żele", "parent": "Higiena osobista"}
+{"name": "Golenie i depilacja", "parent": "Drogeria"}
+{"name": "Depilacja ciała", "parent": "Golenie i depilacja"}
+{"name": "Pielęgnacja jamy ustnej", "parent": "Drogeria"}
+{"name": "Pasty do zębów", "parent": "Pielęgnacja jamy ustnej"}
+{"name": "Szczoteczki do zębów", "parent": "Pielęgnacja jamy ustnej"}
+{"name": "Papier toaletowy i chusteczki", "parent": "Drogeria"}
+{"name": "Papier toaletowy", "parent": "Papier toaletowy i chusteczki"}
+{"name": "Chusteczki nawilżane", "parent": "Papier toaletowy i chusteczki"}
+{"name": "Pieluchy", "parent": "Papier toaletowy i chusteczki"}
+{"name": "Inne", "parent": "Drogeria"}
+{"name": "Dla domu", "parent": null}
+{"name": "Sprzątanie", "parent": "Dla domu"}
+{"name": "Zmywanie naczyń", "parent": "Sprzątanie"}
+{"name": "Płyny do mycia", "parent": "Sprzątanie"}
+{"name": "Spray", "parent": "Sprzątanie"}
+{"name": "Do szyb", "parent": "Sprzątanie"}
+{"name": "Do rur i wc", "parent": "Sprzątanie"}
+{"name": "Czyszczenie zmywarek", "parent": "Sprzątanie"}
+{"name": "Pranie", "parent": "Dla domu"}
+{"name": "Proszki", "parent": "Pranie"}
+{"name": "Kapsułki", "parent": "Pranie"}
+{"name": "Płyny do prania", "parent": "Pranie"}
+{"name": "Płyny do płukania", "parent": "Pranie"}
+{"name": "Odplamiacze", "parent": "Pranie"}
+{"name": "Akcesoria do prania", "parent": "Pranie"}
+{"name": "Domowy niezbędnik", "parent": "Dla domu"}
+{"name": "Odświeżacze", "parent": "Domowy niezbędnik"}
+{"name": "Żarówki", "parent": "Domowy niezbędnik"}
+{"name": "Baterie", "parent": "Domowy niezbędnik"}
+{"name": "Ścierki", "parent": "Domowy niezbędnik"}
+{"name": "Worki na śmieci", "parent": "Domowy niezbędnik"}
+{"name": "Akcesoria", "parent": "Domowy niezbędnik"}
+{"name": "Dla dzieci", "parent": null}
+{"name": "Jedzenie dla dzieci", "parent": "Dla dzieci"}
+{"name": "Dania w słoikach", "parent": "Jedzenie dla dzieci"}
+{"name": "Kaszki", "parent": "Jedzenie dla dzieci"}
+{"name": "Desery i przekąski", "parent": "Jedzenie dla dzieci"}
+{"name": "Mleko dla niemowląt", "parent": "Jedzenie dla dzieci"}
+{"name": "Soki i napoje", "parent": "Jedzenie dla dzieci"}
+{"name": "Pielęgnacja ciała", "parent": "Dla dzieci"}
+{"name": "Kąpiel", "parent": "Pielęgnacja ciała"}
+{"name": "Chusteczki nawilżane", "parent": "Dla dzieci"}
+{"name": "Pieluchy", "parent": "Dla dzieci"}
+{"name": "Dla zwierząt", "parent": null}
+{"name": "Dla kota", "parent": "Dla zwierząt"}
+{"name": "Karmy suche", "parent": "Dla kota"}
+{"name": "Karmy mokre", "parent": "Dla kota"}
+{"name": "Przysmaki", "parent": "Dla kota"}
+{"name": "Żwirek", "parent": "Dla kota"}
+{"name": "Dla psa", "parent": "Dla zwierząt"}
+{"name": "Karmy suche", "parent": "Dla psa"}
+{"name": "Karmy mokre", "parent": "Dla psa"}
+{"name": "Przysmaki", "parent": "Dla psa"}
+{"name": "Szampony", "parent": "Dla psa"}
