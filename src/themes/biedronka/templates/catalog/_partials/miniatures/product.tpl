@@ -1,4 +1,4 @@
-<div class="mr-2 last:mr-0 max-w-[168px] md:max-w-[272px] md+:max-w-[308px] w-full bg-white rounded-br-4xl border border-gray-200 shadow-sm relative overflow-hidden group">
+<div class="product-miniature js-product-miniature mr-2 last:mr-0 max-w-[168px] md:max-w-[272px] md+:max-w-[308px] w-full bg-white rounded-br-4xl border border-gray-200 shadow-sm relative overflow-hidden group">
 
     <button aria-label="favorite" class="hidden group-hover:block absolute top-3 right-3 text-red-500 z-10">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
@@ -12,7 +12,7 @@
     <div class="relative max-h-min flex items-start m-4">
         <div class="w-28 h-28 flex items-center justify-center">
             {if $product.cover}
-                <a href="{$product.url}" class="thumbnail product-thumbnail">
+                <a href="{$product.url}" class="thumbnail product-thumbnail js-product-link">
                     <img
                             src="{$product.cover.bySize.home_default.url}"
                             alt="{if !empty($product.cover.legend)}{$product.cover.legend}{else}{$product.name|truncate:30:'...'}{/if}"
@@ -23,7 +23,7 @@
                     />
                 </a>
             {else}
-                <a href="{$product.url}" class="thumbnail product-thumbnail">
+                <a href="{$product.url}" class="thumbnail product-thumbnail js-product-link">
                     <img
                             src="{$urls.no_picture_image.bySize.home_default.url}"
                             loading="lazy"
@@ -60,7 +60,7 @@
     </div>
 
     <div class="px-5 min-h-40">
-        <h3 class="text-sm! font-semibold text-gray-900">
+        <h3 class="product-title text-sm! font-semibold text-gray-900">
             {$product.name|truncate:30}
         </h3>
         <p class="text-[10px]! text-gray-500">
@@ -68,8 +68,7 @@
         </p>
     </div>
 
-    <button aria-label="add"
-            class="absolute right-3 bottom-3 w-10 h-10 bg-white  text-red-500 border-red-500 border-1 rounded-full text-5xl flex items-center justify-center">
+    <button aria-label="add" data-button-action="add-to-cart" class="add-to-cart absolute right-3 bottom-3 w-10 h-10 bg-white text-red-500 border-red-500 border-1 rounded-full text-5xl flex items-center justify-center">
         +
     </button>
 </div>
