@@ -1,7 +1,7 @@
 import requests
 import xml.etree.ElementTree as ET
 
-API_URL = 'https://localhost:443/api'
+API_URL = 'http://localhost:8080/api'
 API_KEY = 'DBV8CNPPZLBCCREL5PHLQECG5AN9PSHY' 
 
 TARGETS = {
