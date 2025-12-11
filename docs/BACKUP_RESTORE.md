@@ -1,4 +1,20 @@
+<!-- # 1. Usuń tabelę ps_configuration (symulacja awarii) -->
 <!-- docker exec -it some-mysql mysql -uroot -ptoor prestashop -e "DROP TABLE ps_configuration;" -->
+
+
+<!-- # Sprawdź czy tabela ps_configuration istnieje -->
+<!-- docker exec some-mysql mysql -uroot -ptoor prestashop -e "SELECT COUNT(*) FROM ps_configuration;" -->
+
+<!-- # Usuń zepsuty moduł
+docker exec prestashop rm -rf /var/www/html/modules/ps_checkout
+
+# Cache
+docker exec prestashop rm -rf /var/www/html/var/cache/*
+
+# Restart
+cd ../docker
+docker-compose restart prestashop -->
+
 # Backup & Restore Guide
 
 Complete guide for backing up and restoring PrestaShop shop settings.

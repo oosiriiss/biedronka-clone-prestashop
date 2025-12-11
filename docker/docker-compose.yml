@@ -1,5 +1,20 @@
 version: '3'
 services:
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"   # port 8081 lokalnie, żeby nie kolidował z PrestaShop 8080
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: toor
+    depends_on:
+      - mysql
+    networks:
+      - prestashop_network
+
   mysql:
     container_name: some-mysql
     build:
