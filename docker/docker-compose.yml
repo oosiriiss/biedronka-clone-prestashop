@@ -71,7 +71,7 @@ services:
     networks:
       - prestashop_network
     volumes:
-      - prestashop_data:/var/www/html
+      # - prestashop_data:/var/www/html
       # Use only if needed
       # - ../src/prestashop:/var/www/html
       - ../src/themes/biedronka:/var/www/html/themes/biedronka
