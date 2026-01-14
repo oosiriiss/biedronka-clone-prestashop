@@ -1,9 +1,13 @@
 import requests
 import xml.etree.ElementTree as ET
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # --- KONFIGURACJA ---
-API_URL = 'https://localhost:443/api'
-API_KEY = 'DBV8CNPPZLBCCREL5PHLQECG5AN9PSHY' # Twój klucz API
+API_URL = 'http://localhost:8080/api'
+API_KEY = os.getenv("PRESTASHOP_API_KEY")
 
 # Lista tych samych 5 produktów co w wariantach
 TARGET_PRODUCTS = [

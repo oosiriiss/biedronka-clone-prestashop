@@ -429,7 +429,7 @@ class AsyncBiedronkaScraper(AsyncScraper):
                     }
 
                     # Zapis do pliku po każdym przetworzonym produkcie
-                    with open("products.jsonl", "a", encoding="utf-8") as f:
+                    with open("data/products.jsonl", "a", encoding="utf-8") as f:
                         f.write(json.dumps(product_data, ensure_ascii=False) + "\n")
 
                     print(f"{node.name}: {title}")

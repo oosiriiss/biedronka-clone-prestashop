@@ -1,8 +1,12 @@
 import requests
 import xml.etree.ElementTree as ET
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 API_URL = 'http://localhost:8080/api'
-API_KEY = 'DBV8CNPPZLBCCREL5PHLQECG5AN9PSHY' 
+API_KEY = os.getenv("PRESTASHOP_API_KEY")
 
 TARGETS = {
     "Over Pet Premium Szampon dla psów krótkowłosych 285 ml": {

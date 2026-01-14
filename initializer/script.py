@@ -5,9 +5,12 @@ import re
 import os
 import random
 import urllib3
+from dotenv import load_dotenv
 
-API_URL = 'https://localhost:443/api'
-API_KEY = 'DBV8CNPPZLBCCREL5PHLQECG5AN9PSHY'
+load_dotenv()
+
+API_URL = 'http://localhost:8080/api'
+API_KEY = os.getenv("PRESTASHOP_API_KEY")
 DEBUG = True
 
 class PrestaShopImporter:
@@ -279,15 +282,15 @@ class PrestaShopImporter:
 importer = PrestaShopImporter(API_URL, API_KEY)
 
 print("--- Import Kategorii ---\n")
-if os.path.exists('../scraper/categories.jsonl'):
-    with open('../scraper/categories.jsonl', 'r', encoding='utf-8') as f:
+if os.path.exists('../scraper/data/categories.jsonl'):
+    with open('../scraper/data/categories.jsonl', 'r', encoding='utf-8') as f:
         for line in f:
             data = json.loads(line)
             importer.create_category(data['name'], data['parent'])
 
 print("--- Import Produktów ---")
-if os.path.exists('../scraper/products.jsonl'):
-    with open('../scraper/products.jsonl', 'r', encoding='utf-8') as f:
+if os.path.exists('../scraper/data/products.jsonl'):
+    with open('../scraper/data/products.jsonl', 'r', encoding='utf-8') as f:
         for line in f:
             data = json.loads(line)
             importer.create_product(data)
