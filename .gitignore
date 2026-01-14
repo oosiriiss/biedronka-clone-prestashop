@@ -7,3 +7,6 @@ __pycache__/
 scripts/backups/*
 .venv
 .env
+
+scripts/shop_data_initializer/.env
+scripts/shop_data_initializer/venv/*
