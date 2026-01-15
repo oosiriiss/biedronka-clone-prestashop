@@ -8,8 +8,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.firefox.service import Service
+from webdriver_manager.firefox import GeckoDriverManager
 import os
 
 
@@ -33,22 +33,33 @@ class PrestaShopTester:
         print(f"Pliki będą pobierane do: {download_dir}")
         self.download_dir = download_dir
 
-        options = webdriver.ChromeOptions()
+        options = webdriver.FirefoxOptions()
         options.add_argument("--start-maximized")
         options.add_argument("--ignore-certificate-errors")
         options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        options.add_experimental_option("useAutomationExtension", False)
+
+        options.set_preference("browser.download.folderList", 2)
+        options.set_preference("browser.download.dir", download_dir)
+        options.set_preference("browser.download.useDownloadDir", True)
+
+
+        mime_types = "application/pdf,application/octet-stream,image/jpeg,image/png,text/csv,application/zip"
+        options.set_preference("browser.helperApps.neverAsk.saveToDisk", mime_types)
+
+        # chrome
+        # options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        # options.add_experimental_option("useAutomationExtension", False)
 
         prefs = {
             "download.default_directory": download_dir,
             "download.prompt_for_download": False,
             "plugins.always_open_pdf_externally": True,
         }
-        options.add_experimental_option("prefs", prefs)
 
-        self.driver = webdriver.Chrome(
-            service=Service(ChromeDriverManager().install()), options=options
+        # options.add_experimental_option("prefs", prefs)
+
+        self.driver = webdriver.Firefox(
+            service=Service(GeckoDriverManager().install()), options=options
         )
 
         self.wait = WebDriverWait(self.driver, 15)

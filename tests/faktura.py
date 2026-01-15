@@ -1,7 +1,7 @@
 import time
 import main
 
-EMAIL="test_gu34g2v7_1768469948@example.com"
+EMAIL="test_zfozh7kv_1768473584@example.com"
 PASSWORD="Haslo123!"
 BASE_URL = "https://localhost"
 
