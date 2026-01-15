@@ -12,6 +12,7 @@ Academic project developed for a university course. The goal is to create an e-c
   - PHP: 7.4
   - PrestaShop: 1.7.8.10
   - MySQL: 5.7
+  - Python 3.12.3
 
 # Installation
 ```

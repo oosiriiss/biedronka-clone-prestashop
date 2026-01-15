@@ -119,6 +119,7 @@ modules/*
 override/*
 themes/*/
 !themes/classic
+!themes/biedronka
 !themes/_core
 !themes/_libraries
 

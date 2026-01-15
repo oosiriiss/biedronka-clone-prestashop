@@ -1,5 +1,20 @@
 version: '3'
 services:
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"   # port 8081 lokalnie, żeby nie kolidował z PrestaShop 8080
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: toor
+    depends_on:
+      - mysql
+    networks:
+      - prestashop_network
+
   mysql:
     container_name: some-mysql
     build:
@@ -16,6 +31,8 @@ services:
         limits:
           cpus: '1.0'
           memory: 1024M
+    volumes:
+      - mysql_data:/var/lib/mysql
     networks:
       - prestashop_network
   prestashop:
@@ -28,6 +45,7 @@ services:
       - mysql
     ports:
       - 8080:80
+      - 443:443
     environment:
       DB_SERVER: some-mysql
       DB_NAME: prestashop
@@ -35,10 +53,10 @@ services:
       DB_PASSWD: toor
       PS_INSTALL_AUTO: 1
       PS_DEV_MODE: 1
-      PS_DOMAIN: localhost:8080
+      PS_DOMAIN: localhost
       PS_LANGUAGE: en
       PS_COUNTRY: us
-      PS_ENABLE_SSL: 0
+      PS_ENABLE_SSL: 1
       ADMIN_MAIL: makajler@szpont.pl
       ADMIN_PASSWD: password
       PS_FOLDER_ADMIN: admin-dev
@@ -53,8 +71,16 @@ services:
     networks:
       - prestashop_network
     volumes:
+      # - prestashop_data:/var/www/html
       # Use only if needed
       # - ../src/prestashop:/var/www/html
-      - ../src/biedronka-theme:/var/www/html/themes/biedronka
+      - ../src/themes/biedronka:/var/www/html/themes/biedronka
+      - ./certs:/etc/ssl/private:ro
 networks:
     prestashop_network:
+
+volumes:
+  mysql_data:
+    driver: local
+  prestashop_data:
+    driver: local

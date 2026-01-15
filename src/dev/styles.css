@@ -1,0 +1,38 @@
+@import "tailwindcss";
+@import "tailwindcss/preflight";
+@source "../themes/biedronka/templates/**/*.tpl";
+@source "../themes/biedronka/assets/js/**/*.js";
+@source "../themes/biedronka/modules/**/*.tpl";
+@tailwind utilities;
+
+
+@layer base {
+
+    *,
+    *::before,
+    *::after {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        @apply max-w-screen overflow-x-hidden;
+    }
+}
+
+
+/**
+* Source css file 
+*/
+
+
+.card-soft {
+    @apply border-gray-100 border-1;
+}
+
+.header-delivery-button {
+    @apply flex items-center gap-2 border-gray-100 border-1 px-[12px] py-[8px] rounded-lg text-xs font-bold text-gray-800;
+}
+
+
