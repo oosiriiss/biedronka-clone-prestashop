@@ -387,6 +387,7 @@ class PrestaShopTester:
                 self.cart_products.append(product_name)
                 print(f"Dodano: {product_name}")
 
+                time.sleep(2)
 
                 # Zamkniecie okienka z potwierdznieme
                 try:
