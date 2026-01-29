@@ -1,0 +1,2 @@
+TUNEL DO ADMINER: ssh -J rsww@172.20.83.101 -L 19099:student-swarm01.maas:9099 hdoop@student-swarm01.maas
+TUNEL DO PRESTASHOPA: ssh -J rsww@172.20.83.101 -L 19776:student-swarm01.maas:19776 hdoop@student-swarm01.maas

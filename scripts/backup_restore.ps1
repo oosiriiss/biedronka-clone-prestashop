@@ -4,11 +4,19 @@
 # -------------------------------------------------
 
 # Nazwy kontenerow 
+<<<<<<< HEAD
+$MysqlContainer = "admin-mysql_db"
+$PrestaContainer = "prestashop"
+
+# Katalog backupu do przywrocenia
+$BackupDir = ".\backup_20260115_133209"
+=======
 $MysqlContainer = "some-mysql"
 $PrestaContainer = "prestashop"
 
 # Katalog backupu do przywrocenia
 $BackupDir = ".\backup_20260114_211728"
+>>>>>>> origin/quuixly-patch-1
 
 if (-not (Test-Path -Path $BackupDir)) {
     Write-Host "Katalog backupu $BackupDir nie istnieje!" -ForegroundColor Red
@@ -25,7 +33,11 @@ if (Test-Path $SqlFileLocal) {
     docker cp "$SqlFileLocal" "$($MysqlContainer):$SqlFileRemote"
     
     Write-Host "Importowanie SQL wewnatrz kontenera..." -ForegroundColor Gray
+<<<<<<< HEAD
+    docker exec -i $MysqlContainer bash -c "mysql -u root -pstudent BE_197757 < $SqlFileRemote"
+=======
     docker exec -i $MysqlContainer bash -c "mysql -u root -ptoor prestashop < $SqlFileRemote"
+>>>>>>> origin/quuixly-patch-1
     
     docker exec -i $MysqlContainer rm $SqlFileRemote
     Write-Host "Baza danych przywrocona." -ForegroundColor Green
@@ -35,8 +47,13 @@ if (Test-Path $SqlFileLocal) {
 }
 
 # Przywracanie plikow konfiguracyjnych
+<<<<<<< HEAD
+# Write-Host "Przywracanie plikow konfiguracyjnych..." -ForegroundColor Cyan
+# docker cp "$BackupDir/config/parameters.php" "$($PrestaContainer):/var/www/html/app/config/parameters.php"
+=======
 Write-Host "Przywracanie plikow konfiguracyjnych..." -ForegroundColor Cyan
 docker cp "$BackupDir/config/parameters.php" "$($PrestaContainer):/var/www/html/app/config/parameters.php"
+>>>>>>> origin/quuixly-patch-1
 
 if (Test-Path "$BackupDir/config/.htaccess") {
     docker cp "$BackupDir/config/.htaccess" "$($PrestaContainer):/var/www/html/.htaccess"

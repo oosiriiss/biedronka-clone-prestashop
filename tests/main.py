@@ -327,7 +327,7 @@ class PrestaShopTester:
         print("=" * 60)
 
         self.driver.get(self.base_url)
-        time.sleep(1)
+        time.sleep(2)
 
         search_terms = ["Marcheweczki", "Masło", "Baton"]
         search_term = random.choice(search_terms)
@@ -351,7 +351,15 @@ class PrestaShopTester:
             if len(products) == 0:
                 print("Nie znaleziono produktów, używam pierwszego z dostępnych")
                 self.driver.get(self.base_url)
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+                time.sleep(2)
+=======
+                time.sleep(1.5)
+>>>>>>> Stashed changes
+=======
                 time.sleep(1)
+>>>>>>> origin/quuixly-patch-1
                 products = self.driver.find_elements(
                     By.CSS_SELECTOR,
                     "article.product-miniature.js-product-miniature",
@@ -364,7 +372,15 @@ class PrestaShopTester:
                 self.driver.execute_script(
                     "arguments[0].scrollIntoView(true);", random_product
                 )
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+                time.sleep(0.5)
+=======
+                time.sleep(1.5)
+>>>>>>> Stashed changes
+=======
                 time.sleep(1)
+>>>>>>> origin/quuixly-patch-1
 
                 try:
                     product_name = random_product.find_element(
@@ -376,7 +392,15 @@ class PrestaShopTester:
                 random_product.find_element(
                     By.CSS_SELECTOR, "a.thumbnail.product-thumbnail"
                 ).click()
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+                time.sleep(2)
+=======
+                time.sleep(1.5)
+>>>>>>> Stashed changes
+=======
                 time.sleep(1)
+>>>>>>> origin/quuixly-patch-1
 
                 self.wait_and_click(
                     By.CSS_SELECTOR,
@@ -414,11 +438,26 @@ class PrestaShopTester:
 
         # Przejdź do koszyka
         try:
+<<<<<<< HEAD
+            self.wait_and_click(By.CSS_SELECTOR, ".blockcart a[href*='cart']")
+<<<<<<< Updated upstream
+            time.sleep(2)
+        except:
+            self.driver.get(f"{self.base_url}/cart?action=show")
+            time.sleep(2)
+=======
+            time.sleep(1)
+        except:
+            self.driver.get(f"{self.base_url}/index.php?controller=cart&action=show")
+            time.sleep(1)
+>>>>>>> Stashed changes
+=======
             self.wait_and_click(By.CSS_SELECTOR, ".blockcart a[href*='koszyk']")
             time.sleep(1)
         except:
             self.driver.get(f"{self.base_url}/koszyk?action=show")
             time.sleep(1)
+>>>>>>> origin/quuixly-patch-1
 
         cart_items = self.driver.find_elements(By.CSS_SELECTOR, "li.cart-item")
         print(f"W koszyku jest {len(cart_items)} linii produktów")
@@ -462,8 +501,15 @@ class PrestaShopTester:
 
         print(f"Zakończono usuwanie produktów (usunięto: {removed})")
 
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+=======
+    def login(self,email,password):
+        self.driver.get(f"{self.base_url}/index.php?controller=authentication&back=my-account")
+=======
     def login(self,email,password):
         self.driver.get(f"{self.base_url}/moje-konto")
+>>>>>>> origin/quuixly-patch-1
 
         email_field = self.wait_for_element(
                     By.CSS_SELECTOR, "input#field-email"
@@ -489,6 +535,10 @@ class PrestaShopTester:
         time.sleep(1)
 
 
+<<<<<<< HEAD
+>>>>>>> Stashed changes
+=======
+>>>>>>> origin/quuixly-patch-1
     def register_account(self):
         print("\n" + "=" * 60)
         print("KROK 4: Rejestracja nowego konta")
@@ -501,8 +551,18 @@ class PrestaShopTester:
         print(f"Hasło: {self.user_password}")
 
         try:
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+            self.driver.get(f"{self.base_url}/login")
+            time.sleep(2)
+=======
+            self.driver.get(f"{self.base_url}/index.php?controller=authentication&back=my-account")
+            time.sleep(1)
+>>>>>>> Stashed changes
+=======
             self.driver.get(f"{self.base_url}/moje-konto")
             time.sleep(1)
+>>>>>>> origin/quuixly-patch-1
 
             try:
                 register_link = self.driver.find_element(
@@ -602,13 +662,29 @@ class PrestaShopTester:
             self.wait_and_click(By.CSS_SELECTOR, "a[href*='koszyk']")
             time.sleep(2)
         except:
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+            self.driver.get(f"{self.base_url}/cart?action=show")
+=======
+            self.driver.get(f"{self.base_url}/index.php?controller=cart&action=show")
+>>>>>>> Stashed changes
+=======
             self.driver.get(f"{self.base_url}/koszyk?action=show")
+>>>>>>> origin/quuixly-patch-1
             time.sleep(2)
 
         try:
             self.wait_and_click(
                 By.CSS_SELECTOR,
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+                "a[href*='checkout'], .checkout-button, a.btn[href*='order']",
+=======
+                "a[href*='order'], .checkout-button, a.btn[href*='zamówienie']",
+>>>>>>> Stashed changes
+=======
                 "a[href*='checkout'], .checkout-button, a.btn[href*='zamówienie']",
+>>>>>>> origin/quuixly-patch-1
             )
             time.sleep(1)
             print("Rozpoczęto proces zamówienia")
@@ -884,7 +960,16 @@ class PrestaShopTester:
         print("=" * 60)
 
         try:
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+            # Przejdź do konta
+            self.driver.get(f"{self.base_url}/my-account")
+=======
+            self.driver.get(f"{self.base_url}/index.php?controller=authentication&back=my-account")
+>>>>>>> Stashed changes
+=======
             self.driver.get(f"{self.base_url}/moje-konto")
+>>>>>>> origin/quuixly-patch-1
             time.sleep(2)
 
             self.wait_and_click(
@@ -930,8 +1015,18 @@ class PrestaShopTester:
 
         try:
             print("Przechodzę do historii zamówień...")
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+            self.driver.get(f"{self.base_url}/order-history")
+            time.sleep(3)
+=======
+            self.driver.get(f"{self.base_url}/index.php?controller=history")
+            time.sleep(2)
+>>>>>>> Stashed changes
+=======
             self.driver.get(f"{self.base_url}/historia-zamowien")
             time.sleep(2)
+>>>>>>> origin/quuixly-patch-1
 
             if self.order_reference:
                 print(f"Szukam faktury dla zamówienia: {self.order_reference}")
@@ -1062,7 +1157,18 @@ class PrestaShopTester:
 
 
 def main():
+<<<<<<< HEAD
+<<<<<<< Updated upstream
+    """Główna funkcja"""
+    # Możesz zmienić URL na swój
     BASE_URL = "https://localhost"
+    # BASE_URL = "http://localhost:8080"
+=======
+    BASE_URL = "https://localhost:19776"
+>>>>>>> Stashed changes
+=======
+    BASE_URL = "https://localhost"
+>>>>>>> origin/quuixly-patch-1
 
     tester = PrestaShopTester(base_url=BASE_URL)
     tester.run_full_test()

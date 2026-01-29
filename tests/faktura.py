@@ -1,9 +1,15 @@
 import time
 import main
 
+<<<<<<< HEAD
+EMAIL="test_ciex15mq_1769679106@example.com"
+PASSWORD="Haslo123!"
+BASE_URL = "https://localhost:19776"
+=======
 EMAIL="test_zfozh7kv_1768473584@example.com"
 PASSWORD="Haslo123!"
 BASE_URL = "https://localhost"
+>>>>>>> origin/quuixly-patch-1
 
 def main_fn():
 
