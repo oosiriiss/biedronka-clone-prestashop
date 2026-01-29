@@ -21,5 +21,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: docker/prestashop/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/biedronka-clone:latest
