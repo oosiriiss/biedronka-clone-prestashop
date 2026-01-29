@@ -1,9 +1,3 @@
-# https://googlechromelabs.github.io/chrome-for-testing/#stable
-"""
-Automatyczny test sklepu PrestaShop - Selenium
-Wykonuje wszystkie wymagane operacje w czasie do 5 minut.
-"""
-
 import time
 import random
 import string
@@ -14,8 +8,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.firefox.service import Service
+from webdriver_manager.firefox import GeckoDriverManager
 import os
 
 
@@ -39,22 +33,33 @@ class PrestaShopTester:
         print(f"Pliki będą pobierane do: {download_dir}")
         self.download_dir = download_dir
 
-        options = webdriver.ChromeOptions()
+        options = webdriver.FirefoxOptions()
         options.add_argument("--start-maximized")
         options.add_argument("--ignore-certificate-errors")
         options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        options.add_experimental_option("useAutomationExtension", False)
+
+        options.set_preference("browser.download.folderList", 2)
+        options.set_preference("browser.download.dir", download_dir)
+        options.set_preference("browser.download.useDownloadDir", True)
+
+
+        mime_types = "application/pdf,application/octet-stream,image/jpeg,image/png,text/csv,application/zip"
+        options.set_preference("browser.helperApps.neverAsk.saveToDisk", mime_types)
+
+        # chrome
+        # options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        # options.add_experimental_option("useAutomationExtension", False)
 
         prefs = {
             "download.default_directory": download_dir,
             "download.prompt_for_download": False,
             "plugins.always_open_pdf_externally": True,
         }
-        options.add_experimental_option("prefs", prefs)
 
-        self.driver = webdriver.Chrome(
-            service=Service(ChromeDriverManager().install()), options=options
+        # options.add_experimental_option("prefs", prefs)
+
+        self.driver = webdriver.Firefox(
+            service=Service(GeckoDriverManager().install()), options=options
         )
 
         self.wait = WebDriverWait(self.driver, 15)
@@ -63,7 +68,7 @@ class PrestaShopTester:
     def teardown(self):
         if self.driver:
             print("\nZamykanie przeglądarki...")
-            time.sleep(2)
+            time.sleep(0.5)
             self.driver.quit()
             print("Przeglądarka zamknięta")
 
@@ -76,7 +81,7 @@ class PrestaShopTester:
 
     def generate_random_password(self):
         return (
-            "".join(random.choices(string.ascii_letters + string.digits, k=12)) + "A1!"
+            "Haslo123!"
         )
 
     def wait_and_click(self, by, value, timeout=10):
@@ -135,137 +140,186 @@ class PrestaShopTester:
             return [self.base_url]
 
     def add_products_to_cart(self):
-        print("\n" + "=" * 60)
-        print("KROK 1: Dodawanie 10 produktów do koszyka")
-        print("=" * 60)
+            print("\n" + "=" * 60)
+            print("Dodawanie 10 produktów do koszyka (w tym jeden x2)")
+            print("=" * 60)
 
-        self.driver.get(self.base_url)
-        time.sleep(2)
-        self.accept_cookies_if_present()
+            self.driver.get(self.base_url)
+            time.sleep(1)
+            self.accept_cookies_if_present()
 
-        categories = self.get_categories()
-        total_added = 0
-        added_product_urls = set()
+            categories = self.get_categories()
+            total_added = 0
+            added_product_urls = set()
+            
+            # Czy dodalismy produkt w ziekosznej ilsci
+            quantity_increased = False 
 
-        for cat_index, category_url in enumerate(categories[:2], 1):
-            if total_added >= 10:
-                break
+            for cat_index, category_url in enumerate(categories[:2], 1):
+                if total_added >= 10:
+                    break
 
-            print(f"\nKategoria {cat_index}/2")
-            self.driver.get(category_url)
-            time.sleep(2)
+                print(f"\nKategoria {cat_index}/2")
+                self.driver.get(category_url)
+                time.sleep(0.5)
 
-            # Znajdź produkty (struktura: article.product-miniature.js-product-miniature)
-            products = self.driver.find_elements(
-                By.CSS_SELECTOR,
-                "article.product-miniature.js-product-miniature",
-            )
+                products = self.driver.find_elements(
+                    By.CSS_SELECTOR,
+                    "article.product-miniature.js-product-miniature",
+                )
 
-            print(f" Znaleziono {len(products)} produktów w kategorii")
+                print(f"Znaleziono {len(products)} produktów w kategorii")
 
-            products_added_from_category = 0
-            i = 0
-            while total_added < 10 and i < len(products):
-                try:
-                    # - odśwież listę produktów po każdym powrocie
-                    products = self.driver.find_elements(
-                        By.CSS_SELECTOR,
-                        "article.product-miniature.js-product-miniature",
-                    )
+                products_added_from_category = 0
+                i = 0
+                
+                while total_added < 10 and i < len(products):
+                    if products_added_from_category >= 5: 
+                         break 
 
-                    if i >= len(products):
-                        print(f" Brak więcej produktów w kategorii")
-                        break
-
-                    product = products[i]
-
-                    # - użyj JS żeby uniknąć stale element
-                    product_url = self.driver.execute_script(
-                        "return arguments[0].querySelector('a.thumbnail.product-thumbnail')?.href;",
-                        product,
-                    )
-                    product_name = self.driver.execute_script(
-                        "return arguments[0].querySelector('.product-title a')?.textContent?.trim();",
-                        product,
-                    )
-
-                    if not product_url:
-                        print(f" Nie znaleziono linku do produktu")
-                        continue
-                    if product_url in added_product_urls:
-                        print(f" Produkt już w koszyku, pomijam")
-                        continue
-
-                    if not product_name:
-                        product_name = f"Produkt {total_added + 1}"
-
-                    self.driver.get(product_url)
-                    time.sleep(2)
-
-                    # - kliknij przycisk add to cart
                     try:
-                        add_button = self.wait_for_element(
+                        products = self.driver.find_elements(
                             By.CSS_SELECTOR,
-                            "button.add-to-cart[data-button-action='add-to-cart']",
-                            timeout=10,
+                            "article.product-miniature.js-product-miniature",
                         )
 
-                        # Przewiń do przycisku
-                        self.driver.execute_script(
-                            "arguments[0].scrollIntoView({block: 'center'});",
-                            add_button,
-                        )
-                        time.sleep(0.5)
+                        if i >= len(products):
+                            print(f"Brak więcej produktów w kategorii")
+                            break
 
-                        add_button.click()
-                        print(f"  Kliknięto 'Add to cart' dla: {product_name}")
-                        time.sleep(3)
+                        product = products[i]
+
+                        product_url = self.driver.execute_script(
+                            "return arguments[0].querySelector('a.thumbnail.product-thumbnail')?.href;",
+                            product,
+                        )
+                        product_name = self.driver.execute_script(
+                            "return arguments[0].querySelector('.product-title a')?.textContent?.trim();",
+                            product,
+                        )
+
+                        if not product_url:
+                            i += 1
+                            continue
+                            
+                        if product_url in added_product_urls:
+                            print(f"Produkt już w koszyku, pomijam: {product_name}")
+                            i += 1
+                            continue
+
+                        if not product_name:
+                            product_name = f"Produkt {total_added + 1}"
+
+                        self.driver.get(product_url)
+                        time.sleep(0.8)
+
+                        # --- SPRAWDZANIE DOSTĘPNOŚCI ---
+                        is_available = True
+                        try:
+                            add_buttons = self.driver.find_elements(
+                                By.CSS_SELECTOR, 
+                                "button.add-to-cart[data-button-action='add-to-cart']"
+                            )
+                            
+                            if not add_buttons:
+                                print(f" Brak przycisku 'Dodaj do koszyka' - POMIJANIE: {product_name}")
+                                is_available = False
+                            elif not add_buttons[0].is_enabled():
+                                print(f" Produkt niedostępny - POMIJANIE: {product_name}")
+                                is_available = False
+                            
+                            if is_available:
+                                try:
+                                    availability_label = self.driver.find_element(By.ID, "product-availability")
+                                    if "brak" in availability_label.text.lower() or "niedostępny" in availability_label.text.lower():
+                                        print(f"Oznaczenie braku w magazynie - POMIJANIE: {product_name}")
+                                        is_available = False
+                                except:
+                                    pass 
+                        except Exception as e:
+                            is_available = False
+
+                        if not is_available:
+                            self.driver.get(category_url)
+                            i += 1
+                            continue
+
+                        # - zmiania ilosci tylko raz
+                        current_qty_msg = ""
+                        if not quantity_increased:
+                            try:
+                                qty_input = self.driver.find_element(By.CSS_SELECTOR, "#quantity_wanted")
+                                qty_input.click()
+                                time.sleep(0.2)
+                                qty_input.send_keys(Keys.BACK_SPACE)
+                                qty_input.send_keys("2")
+                                time.sleep(0.5)
+                                
+                                quantity_increased = True
+                                current_qty_msg = " (Ilość: 2 szt.)"
+                                print(f" Zmieniono ilość na 2 dla: {product_name}")
+                            except Exception as e:
+                                print(f" Nie udało się zmienić ilości: {e}")
+
+                        try:
+                            add_button = add_buttons[0]
+                            self.driver.execute_script(
+                                "arguments[0].scrollIntoView({block: 'center'});",
+                                add_button,
+                            )
+                            time.sleep(0.5)
+
+                            add_button.click()
+                            print(f" Kliknięto 'Add to cart'{current_qty_msg} dla: {product_name}")
+                            time.sleep(1)
+
+                        except Exception as e:
+                            print(f" Błąd przy klikaniu 'Add to cart': {str(e)[:80]}")
+                            self.driver.get(category_url)
+                            i += 1
+                            continue
+
+                        total_added += 1
+                        products_added_from_category += 1
+                        if product_url:
+                            added_product_urls.add(product_url)
+                        
+                        log_name = product_name + (" (x2)" if current_qty_msg else "")
+                        self.cart_products.append(log_name)
+                        
+                        print(f" Dodano: {log_name} - Produkt {total_added}/10")
+
+                        try:
+                            close_btn = self.wait_for_element(
+                                 By.CSS_SELECTOR,
+                                 "button.close, .modal-close, [class*='close'], .blockcart-modal .close",
+                                 timeout=3
+                            )
+                            close_btn.click()
+                            time.sleep(0.5)
+                        except:
+                            pass 
+
+                        self.driver.get(category_url)
+                        time.sleep(1)
+                        i += 1
 
                     except Exception as e:
-                        print(f" Błąd przy klikaniu 'Add to cart': {str(e)[:80]}")
+                        print(f" Błąd krytyczny: {str(e)[:100]}")
+                        try:
+                            self.driver.get(category_url)
+                        except:
+                            pass
+                        i += 1
                         continue
 
-                    total_added += 1
-                    products_added_from_category += 1
-                    if product_url:
-                        added_product_urls.add(product_url)
-                    self.cart_products.append(product_name)
-                    print(f" Dodano: {product_name} - Produkt {total_added}/10")
+                print(f"    Dodano {products_added_from_category} produktów z tej kategorii")
+                if total_added >= 10:
+                    break
 
-                    time.sleep(2)
-                    try:
-                        close_btn = self.driver.find_element(
-                            By.CSS_SELECTOR,
-                            "button.close, .modal-close, [class*='close']",
-                        )
-                        close_btn.click()
-                        time.sleep(0.5)
-                    except:
-                        pass
+            print(f"\nDodano łącznie {total_added} pozycji do koszyka")
 
-                    self.driver.get(category_url)
-                    time.sleep(2)
 
-                    i += 1
-
-                except Exception as e:
-                    print(f" Błąd: {str(e)[:100]}")
-                    try:
-                        self.driver.get(category_url)
-                        time.sleep(2)
-                    except:
-                        pass
-                    i += 1
-                    continue
-
-            print(
-                f"    Dodano {products_added_from_category} produktów z tej kategorii"
-            )
-
-            if total_added >= 10:
-                break
-
-        print(f"\nDodano łącznie {total_added} produktów do koszyka")
 
     def search_and_add_product(self):
         print("\n" + "=" * 60)
@@ -275,7 +329,7 @@ class PrestaShopTester:
         self.driver.get(self.base_url)
         time.sleep(2)
 
-        search_terms = ["shirt", "mug", "poster", "art", "home", "product"]
+        search_terms = ["Marcheweczki", "Masło", "Baton"]
         search_term = random.choice(search_terms)
 
         print(f"Wyszukuję: {search_term}")
@@ -283,12 +337,12 @@ class PrestaShopTester:
         try:
             search_input = self.wait_for_element(
                 By.CSS_SELECTOR,
-                "input[name='s'], input.search-input, input[type='search'], input[placeholder*='Search']",
+                "input[name='s'], input.search-input, input[type='search'], input[placeholder*='Szukaj']",
             )
             search_input.clear()
             search_input.send_keys(search_term)
             search_input.send_keys(Keys.RETURN)
-            time.sleep(2)
+            time.sleep(1)
 
             products = self.driver.find_elements(
                 By.CSS_SELECTOR, "article.product-miniature.js-product-miniature"
@@ -297,11 +351,15 @@ class PrestaShopTester:
             if len(products) == 0:
                 print("Nie znaleziono produktów, używam pierwszego z dostępnych")
                 self.driver.get(self.base_url)
+<<<<<<< HEAD
 <<<<<<< Updated upstream
                 time.sleep(2)
 =======
                 time.sleep(1.5)
 >>>>>>> Stashed changes
+=======
+                time.sleep(1)
+>>>>>>> origin/quuixly-patch-1
                 products = self.driver.find_elements(
                     By.CSS_SELECTOR,
                     "article.product-miniature.js-product-miniature",
@@ -314,11 +372,15 @@ class PrestaShopTester:
                 self.driver.execute_script(
                     "arguments[0].scrollIntoView(true);", random_product
                 )
+<<<<<<< HEAD
 <<<<<<< Updated upstream
                 time.sleep(0.5)
 =======
                 time.sleep(1.5)
 >>>>>>> Stashed changes
+=======
+                time.sleep(1)
+>>>>>>> origin/quuixly-patch-1
 
                 try:
                     product_name = random_product.find_element(
@@ -330,19 +392,40 @@ class PrestaShopTester:
                 random_product.find_element(
                     By.CSS_SELECTOR, "a.thumbnail.product-thumbnail"
                 ).click()
+<<<<<<< HEAD
 <<<<<<< Updated upstream
                 time.sleep(2)
 =======
                 time.sleep(1.5)
 >>>>>>> Stashed changes
+=======
+                time.sleep(1)
+>>>>>>> origin/quuixly-patch-1
 
                 self.wait_and_click(
                     By.CSS_SELECTOR,
                     "button[data-button-action='add-to-cart'], .add-to-cart",
+
                 )
 
                 self.cart_products.append(product_name)
                 print(f"Dodano: {product_name}")
+
+                time.sleep(2)
+
+                # Zamkniecie okienka z potwierdznieme
+                try:
+                    close_btn = self.driver.find_element(
+                        By.CSS_SELECTOR,
+                        "button.close, .modal-close, [class*='close']",
+                    )
+                    close_btn.click()
+                    time.sleep(0.5)
+                except:
+                    pass
+
+
+
                 time.sleep(1)
 
         except Exception as e:
@@ -355,6 +438,7 @@ class PrestaShopTester:
 
         # Przejdź do koszyka
         try:
+<<<<<<< HEAD
             self.wait_and_click(By.CSS_SELECTOR, ".blockcart a[href*='cart']")
 <<<<<<< Updated upstream
             time.sleep(2)
@@ -367,6 +451,13 @@ class PrestaShopTester:
             self.driver.get(f"{self.base_url}/index.php?controller=cart&action=show")
             time.sleep(1)
 >>>>>>> Stashed changes
+=======
+            self.wait_and_click(By.CSS_SELECTOR, ".blockcart a[href*='koszyk']")
+            time.sleep(1)
+        except:
+            self.driver.get(f"{self.base_url}/koszyk?action=show")
+            time.sleep(1)
+>>>>>>> origin/quuixly-patch-1
 
         cart_items = self.driver.find_elements(By.CSS_SELECTOR, "li.cart-item")
         print(f"W koszyku jest {len(cart_items)} linii produktów")
@@ -382,7 +473,7 @@ class PrestaShopTester:
         for i in range(max_to_remove):
             try:
                 if i > 0:
-                    time.sleep(2)
+                    time.sleep(1)
 
                 remove_button = self.driver.find_element(
                     By.CSS_SELECTOR,
@@ -400,7 +491,7 @@ class PrestaShopTester:
                 remove_button.click()
 
                 print(" Czekam na aktualizację koszyka...")
-                time.sleep(4)
+                time.sleep(2)
 
                 print(f"Usunięto produkt {i+1}")
                 removed += 1
@@ -410,10 +501,15 @@ class PrestaShopTester:
 
         print(f"Zakończono usuwanie produktów (usunięto: {removed})")
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
     def login(self,email,password):
         self.driver.get(f"{self.base_url}/index.php?controller=authentication&back=my-account")
+=======
+    def login(self,email,password):
+        self.driver.get(f"{self.base_url}/moje-konto")
+>>>>>>> origin/quuixly-patch-1
 
         email_field = self.wait_for_element(
                     By.CSS_SELECTOR, "input#field-email"
@@ -439,7 +535,10 @@ class PrestaShopTester:
         time.sleep(1)
 
 
+<<<<<<< HEAD
 >>>>>>> Stashed changes
+=======
+>>>>>>> origin/quuixly-patch-1
     def register_account(self):
         print("\n" + "=" * 60)
         print("KROK 4: Rejestracja nowego konta")
@@ -452,6 +551,7 @@ class PrestaShopTester:
         print(f"Hasło: {self.user_password}")
 
         try:
+<<<<<<< HEAD
 <<<<<<< Updated upstream
             self.driver.get(f"{self.base_url}/login")
             time.sleep(2)
@@ -459,8 +559,11 @@ class PrestaShopTester:
             self.driver.get(f"{self.base_url}/index.php?controller=authentication&back=my-account")
             time.sleep(1)
 >>>>>>> Stashed changes
+=======
+            self.driver.get(f"{self.base_url}/moje-konto")
+            time.sleep(1)
+>>>>>>> origin/quuixly-patch-1
 
-            # Znajdź link do rejestracji
             try:
                 register_link = self.driver.find_element(
                     By.CSS_SELECTOR,
@@ -471,7 +574,6 @@ class PrestaShopTester:
             except:
                 print("Formularz rejestracji już widoczny")
 
-            # - wypełnij formularz
             try:
                 self.wait_and_click(
                     By.CSS_SELECTOR, "input[name='id_gender'][value='1']", timeout=5
@@ -504,11 +606,10 @@ class PrestaShopTester:
                 birthday = self.driver.find_element(
                     By.CSS_SELECTOR, "input[name='birthday']"
                 )
-                birthday.send_keys("01/01/1990")
+                birthday.send_keys("1990-01-01")
             except:
                 pass
 
-            # - zaznacz wymagane checkboxy
             try:
                 privacy_cb = self.driver.find_element(
                     By.CSS_SELECTOR, "input[name='customer_privacy'][type='checkbox']"
@@ -520,7 +621,6 @@ class PrestaShopTester:
                 print(f"Nie znaleziono customer_privacy: {str(e)[:50]}")
 
             try:
-                # GDPR/Terms (WYMAGANE)
                 gdpr_cb = self.driver.find_element(
                     By.CSS_SELECTOR, "input[name='psgdpr'][type='checkbox']"
                 )
@@ -532,7 +632,6 @@ class PrestaShopTester:
 
             time.sleep(0.5)
 
-            # Wyślij formularz
             submit_button = self.driver.find_element(
                 By.CSS_SELECTOR,
                 "button[data-link-action='save-customer'], button[type='submit']",
@@ -540,9 +639,8 @@ class PrestaShopTester:
             submit_button.click()
 
             print("Formularz rejestracji wysłany")
-            time.sleep(3)
+            time.sleep(2)
 
-            # Sprawdź czy rejestracja się powiodła
             try:
                 self.driver.find_element(
                     By.CSS_SELECTOR, ".account, .user-info, a[href*='my-account']"
@@ -560,37 +658,43 @@ class PrestaShopTester:
         print("KROK 5: Wykonywanie zamówienia")
         print("=" * 60)
 
-        # Przejdź do koszyka i proceed to checkout
         try:
-            self.wait_and_click(By.CSS_SELECTOR, "a[href*='cart']")
+            self.wait_and_click(By.CSS_SELECTOR, "a[href*='koszyk']")
             time.sleep(2)
         except:
+<<<<<<< HEAD
 <<<<<<< Updated upstream
             self.driver.get(f"{self.base_url}/cart?action=show")
 =======
             self.driver.get(f"{self.base_url}/index.php?controller=cart&action=show")
 >>>>>>> Stashed changes
+=======
+            self.driver.get(f"{self.base_url}/koszyk?action=show")
+>>>>>>> origin/quuixly-patch-1
             time.sleep(2)
 
         try:
             self.wait_and_click(
                 By.CSS_SELECTOR,
+<<<<<<< HEAD
 <<<<<<< Updated upstream
                 "a[href*='checkout'], .checkout-button, a.btn[href*='order']",
 =======
                 "a[href*='order'], .checkout-button, a.btn[href*='zamówienie']",
 >>>>>>> Stashed changes
+=======
+                "a[href*='checkout'], .checkout-button, a.btn[href*='zamówienie']",
+>>>>>>> origin/quuixly-patch-1
             )
-            time.sleep(3)
+            time.sleep(1)
             print("Rozpoczęto proces zamówienia")
         except Exception as e:
             print(f"Problem z rozpoczęciem checkout: {e}")
             return
 
-        # - krok 2: adres
         try:
             print("Sprawdź\u0144 adres dostawy...")
-            time.sleep(2)
+            time.sleep(1)
 
             try:
                 existing_address = self.driver.find_element(
@@ -606,9 +710,9 @@ class PrestaShopTester:
                     )
 
                     fields = {
-                        "input[name='address1']": "123 Test Street",
-                        "input[name='postcode']": "12345",
-                        "input[name='city']": "New York",
+                        "input[name='address1']": "Testowa 14",
+                        "input[name='postcode']": "69-420",
+                        "input[name='city']": "Testowo",
                     }
 
                     for selector, value in fields.items():
@@ -620,19 +724,6 @@ class PrestaShopTester:
                             pass
 
                     try:
-                        state_select = self.driver.find_element(
-                            By.CSS_SELECTOR, "select#field-id_state[name='id_state']"
-                        )
-                        from selenium.webdriver.support.ui import Select
-
-                        select = Select(state_select)
-                        select.select_by_value("1")
-                        print("Wybrano stan: AA")
-                    except Exception as e:
-                        print(f"Nie można wybrać stanu: {str(e)[:50]}")
-
-                    # Kraj (United States)
-                    try:
                         country_select = self.driver.find_element(
                             By.CSS_SELECTOR,
                             "select#field-id_country[name='id_country']",
@@ -640,8 +731,8 @@ class PrestaShopTester:
                         from selenium.webdriver.support.ui import Select
 
                         select = Select(country_select)
-                        select.select_by_value("21")
-                        print("Wybrano kraj: United States")
+                        select.select_by_value("14")
+                        print("Wybrano kraj: Polska")
                     except:
                         print("Kraj już wybrany")
 
@@ -649,7 +740,6 @@ class PrestaShopTester:
                 except:
                     print("Nie można wypełnić adresu")
 
-            # ZAWSZE kliknij Continue (niezależnie czy adres był czy nie)
             time.sleep(1)
             print("Klikam przycisk Continue...")
 
@@ -678,36 +768,30 @@ class PrestaShopTester:
         print("KROK 6: Wybór przewoźnika i płatności")
         print("=" * 60)
 
-        # Wybór przewoźnika
         try:
             print("Wybieramy przewoźnika...")
 
-            # Znajdź radio buttony przewoźników
             carriers = self.driver.find_elements(
                 By.CSS_SELECTOR, "input[type='radio'][name*='delivery_option']"
             )
 
             if len(carriers) >= 1:
-                # Sprawdź czy któryś jest już zaznaczony
                 already_selected = any(c.is_selected() for c in carriers)
 
                 if already_selected:
                     print("Przewoźnik już wybrany (domyślny)")
                 elif len(carriers) >= 2:
-                    # Wybierz losowo jeden z dwóch
                     carrier_choice = random.choice([0, 1])
                     carriers[carrier_choice].click()
                     print(f"Wybrano przewoźnika {carrier_choice + 1}")
                     time.sleep(1)
                 else:
-                    # Wybierz pierwszy
                     carriers[0].click()
                     print("Wybrano jedynego dostępnego przewoźnika")
                     time.sleep(1)
             else:
                 print("Brak opcji przewoźników lub już wybrane")
 
-            # Kontynuuj do płatności
             time.sleep(1)
             print("Klikam przycisk Continue (Shipping)...")
 
@@ -723,19 +807,17 @@ class PrestaShopTester:
                 time.sleep(0.5)
                 continue_btn.click()
                 print("Kliknięto Continue - przechodzę do Payment")
-                time.sleep(3)
+                time.sleep(2)
             except Exception as e:
                 print(f"Błąd przy klikaniu Continue: {str(e)[:80]}")
 
         except Exception as e:
             print(f"Problem z wyborem przewoźnika: {str(e)[:100]}")
 
-        # Wybór płatności
         try:
             print("Wybieramy metodę płatności...")
-            time.sleep(2)  # Poczekaj na załadowanie opcji płatności
+            time.sleep(1)  
 
-            # Znajdź radio buttony płatności (czekaj aż się pojawią)
             payment_radios = self.wait.until(
                 EC.presence_of_all_elements_located(
                     (By.CSS_SELECTOR, "input[type='radio'][name='payment-option']")
@@ -743,13 +825,10 @@ class PrestaShopTester:
             )
 
             if len(payment_radios) >= 3:
-                # Wybierz trzecią opcję (Pay by Cash on Delivery - payment-option-3)
-                # Użyj JavaScript do kliknięcia (bezpieczniejsze dla styled inputs)
                 self.driver.execute_script("arguments[0].click();", payment_radios[2])
                 print("Wybrano metodę płatności: Pay by Cash on Delivery")
                 time.sleep(2)
             elif payment_radios:
-                # Fallback - wybierz pierwszą dostępną
                 self.driver.execute_script("arguments[0].click();", payment_radios[0])
                 print(f"Wybrano pierwszą dostępną metodę płatności")
                 time.sleep(2)
@@ -766,9 +845,7 @@ class PrestaShopTester:
         print("=" * 60)
 
         try:
-            # Zaakceptuj warunki - PrestaShop używa różnych wzorców nazw
             try:
-                # Spróbuj znaleźć checkbox z warunkami (różne możliwe selektory)
                 checkbox_selectors = [
                     "input[name='conditions_to_approve[terms-and-conditions]']",
                     "input#conditions_to_approve\\[terms-and-conditions\\]",
@@ -797,7 +874,6 @@ class PrestaShopTester:
                             terms_checkbox,
                         )
                         time.sleep(0.5)
-                        # Użyj JavaScript do kliknięcia (bezpieczniejsze)
                         self.driver.execute_script(
                             "arguments[0].click();", terms_checkbox
                         )
@@ -813,19 +889,15 @@ class PrestaShopTester:
 
             time.sleep(1)
 
-            # Zatwierdź zamówienie - kliknij "Place order"
-            # Poczekaj aż przycisk przestanie być disabled
             try:
                 print("Czekam aż przycisk 'Place order' będzie aktywny...")
 
-                # Znajdź przycisk
                 confirm_button = self.wait.until(
                     EC.presence_of_element_located(
                         (By.CSS_SELECTOR, "#payment-confirmation button[type='submit']")
                     )
                 )
 
-                # Poczekaj aż przestanie być disabled (max 10 sekund)
                 for i in range(10):
                     if not confirm_button.get_attribute("disabled"):
                         print("Przycisk aktywny!")
@@ -834,18 +906,15 @@ class PrestaShopTester:
                 else:
                     print("Przycisk wciąż disabled, próbuję kliknąć...")
 
-                # Przewiń i kliknij
                 self.driver.execute_script(
                     "arguments[0].scrollIntoView({block: 'center'});", confirm_button
                 )
                 time.sleep(0.5)
 
-                # Użyj JavaScript do kliknięcia (omija disabled)
                 self.driver.execute_script("arguments[0].click();", confirm_button)
                 print("Kliknięto 'Place order'")
 
             except Exception as e:
-                # Alternatywna metoda
                 submit_buttons = self.driver.find_elements(
                     By.CSS_SELECTOR, "#payment-confirmation button[type='submit']"
                 )
@@ -858,7 +927,6 @@ class PrestaShopTester:
             print("Zamówienie zatwierdzone!")
             time.sleep(3)
 
-            # Sprawdź czy jesteśmy na stronie potwierdzenia i zapisz order reference
             try:
                 self.driver.find_element(
                     By.CSS_SELECTOR,
@@ -866,7 +934,6 @@ class PrestaShopTester:
                 )
                 print("Potwierdzenie zamówienia wyświetlone")
 
-                # Spróbuj znaleźć order reference
                 try:
                     order_ref_elem = self.driver.find_element(
                         By.CSS_SELECTOR,
@@ -893,22 +960,24 @@ class PrestaShopTester:
         print("=" * 60)
 
         try:
+<<<<<<< HEAD
 <<<<<<< Updated upstream
             # Przejdź do konta
             self.driver.get(f"{self.base_url}/my-account")
 =======
             self.driver.get(f"{self.base_url}/index.php?controller=authentication&back=my-account")
 >>>>>>> Stashed changes
+=======
+            self.driver.get(f"{self.base_url}/moje-konto")
+>>>>>>> origin/quuixly-patch-1
             time.sleep(2)
 
-            # Kliknij w historię zamówień
             self.wait_and_click(
                 By.CSS_SELECTOR,
-                "a[href*='order-history'], a#history-link, a[id*='order']",
+                "a[href*='historia-zamowien'], a#history-link, a[id*='order']",
             )
             time.sleep(2)
 
-            # Znajdź ostatnie zamówienie
             orders = self.driver.find_elements(
                 By.CSS_SELECTOR, ".order-item, tr[class*='order'], tbody tr"
             )
@@ -916,7 +985,6 @@ class PrestaShopTester:
             if orders:
                 print(f"Znaleziono {len(orders)} zamówienie(ń)")
 
-                # Sprawdź status pierwszego zamówienia
                 try:
                     status = (
                         orders[0]
@@ -946,8 +1014,8 @@ class PrestaShopTester:
         print("=" * 60)
 
         try:
-            # Przejdź do historii zamówień
             print("Przechodzę do historii zamówień...")
+<<<<<<< HEAD
 <<<<<<< Updated upstream
             self.driver.get(f"{self.base_url}/order-history")
             time.sleep(3)
@@ -955,39 +1023,36 @@ class PrestaShopTester:
             self.driver.get(f"{self.base_url}/index.php?controller=history")
             time.sleep(2)
 >>>>>>> Stashed changes
+=======
+            self.driver.get(f"{self.base_url}/historia-zamowien")
+            time.sleep(2)
+>>>>>>> origin/quuixly-patch-1
 
-            # Jeśli mamy order reference, znajdź fakturę dla tego konkretnego zamówienia
             if self.order_reference:
                 print(f"Szukam faktury dla zamówienia: {self.order_reference}")
 
                 try:
-                    # Znajdź wszystkie wiersze w tabeli
                     rows = self.driver.find_elements(By.CSS_SELECTOR, "tbody tr")
 
                     for row in rows:
-                        # Sprawdź czy wiersz zawiera nasz order reference
                         row_text = row.text
                         if self.order_reference in row_text:
                             print(f"Znaleziono zamówienie: {self.order_reference}")
 
-                            # Znajdź link do faktury w tym wierszu
                             invoice_link = row.find_element(
                                 By.CSS_SELECTOR, "a[href*='pdf-invoice']"
                             )
                             invoice_url = invoice_link.get_attribute("href")
                             print(f"URL faktury: {invoice_url}")
 
-                            # Kliknij link
                             invoice_link.click()
                             print("Faktura pobrana!")
-                            time.sleep(3)
+                            time.sleep(2)
                             return True
 
                     print("Nie znaleziono faktury dla tego zamówienia")
                 except Exception as e:
                     print(f"Błąd przy szukaniu konkretnego zamówienia: {str(e)[:80]}")
-
-            # Fallback - znajdź pierwszą dostępną fakturę
             print("Próbuję pobrać pierwszą dostępną fakturę...")
             invoice_links = self.driver.find_elements(
                 By.CSS_SELECTOR, "a[href*='pdf-invoice']"
@@ -997,16 +1062,14 @@ class PrestaShopTester:
                 invoice_url = invoice_links[0].get_attribute("href")
                 print(f"Znaleziono link do faktury: {invoice_url}")
 
-                # Kliknij link do faktury
                 invoice_links[0].click()
                 print("Faktura pobrana!")
-                time.sleep(3)
+                time.sleep(2)
                 return True
             else:
                 print("Nie znaleziono linku do faktury")
                 print("Sprawdzam status zamówienia...")
 
-                # Sprawdź status zamówienia
                 try:
                     status_elem = self.driver.find_element(
                         By.CSS_SELECTOR, "span.label.label-pill"
@@ -1042,33 +1105,35 @@ class PrestaShopTester:
         try:
             self.setup()
 
-            # 1. Dodaj 10 produktów z 2 kategorii
+            # Dodaj 10 produktów z 2 kategorii
             self.add_products_to_cart()
 
-            # 2. Wyszukaj i dodaj produkt
+            # Wyszukaj i dodaj produkt
             self.search_and_add_product()
 
-            # 3. Usuń 3 produkty
+            # Usuń 3 produkty
             self.remove_products_from_cart()
 
-            # 4. Zarejestruj konto
+            # Zarejestruj konto
             self.register_account()
 
-            # 5. Wykonaj zamówienie
+            # Wykonaj zamówienie
             self.complete_order()
 
-            # 6. Wybierz dostawę i płatność
+            # Wybierz dostawę i płatność
             self.select_shipping_and_payment()
 
-            # 7. Zatwierdź zamówienie
+            # Zatwierdź zamówienie
             order_confirmed = self.confirm_order()
 
-            # 8. Sprawdź status
+            # Sprawdź status
             if order_confirmed:
                 self.check_order_status()
 
-                # 9. Pobierz fakturę
-                self.download_invoice()
+
+                # POBIERANIE FAKTURY w faktura.py
+                ##  Pobierz fakturę
+                #self.download_invoice()
 
             end_time = time.time()
             duration = end_time - start_time
@@ -1092,6 +1157,7 @@ class PrestaShopTester:
 
 
 def main():
+<<<<<<< HEAD
 <<<<<<< Updated upstream
     """Główna funkcja"""
     # Możesz zmienić URL na swój
@@ -1100,10 +1166,12 @@ def main():
 =======
     BASE_URL = "https://localhost:19776"
 >>>>>>> Stashed changes
+=======
+    BASE_URL = "https://localhost"
+>>>>>>> origin/quuixly-patch-1
 
     tester = PrestaShopTester(base_url=BASE_URL)
     tester.run_full_test()
-
 
 if __name__ == "__main__":
     main()
