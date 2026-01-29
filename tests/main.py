@@ -273,7 +273,7 @@ class PrestaShopTester:
         print("=" * 60)
 
         self.driver.get(self.base_url)
-        time.sleep(1)
+        time.sleep(2)
 
         search_terms = ["shirt", "mug", "poster", "art", "home", "product"]
         search_term = random.choice(search_terms)
@@ -297,7 +297,11 @@ class PrestaShopTester:
             if len(products) == 0:
                 print("Nie znaleziono produktów, używam pierwszego z dostępnych")
                 self.driver.get(self.base_url)
+<<<<<<< Updated upstream
                 time.sleep(2)
+=======
+                time.sleep(1.5)
+>>>>>>> Stashed changes
                 products = self.driver.find_elements(
                     By.CSS_SELECTOR,
                     "article.product-miniature.js-product-miniature",
@@ -310,7 +314,11 @@ class PrestaShopTester:
                 self.driver.execute_script(
                     "arguments[0].scrollIntoView(true);", random_product
                 )
+<<<<<<< Updated upstream
                 time.sleep(0.5)
+=======
+                time.sleep(1.5)
+>>>>>>> Stashed changes
 
                 try:
                     product_name = random_product.find_element(
@@ -322,7 +330,11 @@ class PrestaShopTester:
                 random_product.find_element(
                     By.CSS_SELECTOR, "a.thumbnail.product-thumbnail"
                 ).click()
+<<<<<<< Updated upstream
                 time.sleep(2)
+=======
+                time.sleep(1.5)
+>>>>>>> Stashed changes
 
                 self.wait_and_click(
                     By.CSS_SELECTOR,
@@ -344,10 +356,17 @@ class PrestaShopTester:
         # Przejdź do koszyka
         try:
             self.wait_and_click(By.CSS_SELECTOR, ".blockcart a[href*='cart']")
+<<<<<<< Updated upstream
             time.sleep(2)
         except:
             self.driver.get(f"{self.base_url}/cart?action=show")
             time.sleep(2)
+=======
+            time.sleep(1)
+        except:
+            self.driver.get(f"{self.base_url}/index.php?controller=cart&action=show")
+            time.sleep(1)
+>>>>>>> Stashed changes
 
         cart_items = self.driver.find_elements(By.CSS_SELECTOR, "li.cart-item")
         print(f"W koszyku jest {len(cart_items)} linii produktów")
@@ -391,6 +410,36 @@ class PrestaShopTester:
 
         print(f"Zakończono usuwanie produktów (usunięto: {removed})")
 
+<<<<<<< Updated upstream
+=======
+    def login(self,email,password):
+        self.driver.get(f"{self.base_url}/index.php?controller=authentication&back=my-account")
+
+        email_field = self.wait_for_element(
+                    By.CSS_SELECTOR, "input#field-email"
+        )
+
+        time.sleep(1)
+
+        email_field.clear()
+        email_field.send_keys(email)
+
+        password_field = self.wait_for_element(
+                    By.CSS_SELECTOR, "input#field-password"
+        )
+        password_field.clear()
+        password_field.send_keys(password)
+
+        time.sleep(1)
+        submit = self.wait_for_element(
+                    By.CSS_SELECTOR, "button#submit-login"
+        )
+        submit.click()
+
+        time.sleep(1)
+
+
+>>>>>>> Stashed changes
     def register_account(self):
         print("\n" + "=" * 60)
         print("KROK 4: Rejestracja nowego konta")
@@ -403,8 +452,13 @@ class PrestaShopTester:
         print(f"Hasło: {self.user_password}")
 
         try:
+<<<<<<< Updated upstream
             self.driver.get(f"{self.base_url}/login")
             time.sleep(2)
+=======
+            self.driver.get(f"{self.base_url}/index.php?controller=authentication&back=my-account")
+            time.sleep(1)
+>>>>>>> Stashed changes
 
             # Znajdź link do rejestracji
             try:
@@ -511,13 +565,21 @@ class PrestaShopTester:
             self.wait_and_click(By.CSS_SELECTOR, "a[href*='cart']")
             time.sleep(2)
         except:
+<<<<<<< Updated upstream
             self.driver.get(f"{self.base_url}/cart?action=show")
+=======
+            self.driver.get(f"{self.base_url}/index.php?controller=cart&action=show")
+>>>>>>> Stashed changes
             time.sleep(2)
 
         try:
             self.wait_and_click(
                 By.CSS_SELECTOR,
+<<<<<<< Updated upstream
                 "a[href*='checkout'], .checkout-button, a.btn[href*='order']",
+=======
+                "a[href*='order'], .checkout-button, a.btn[href*='zamówienie']",
+>>>>>>> Stashed changes
             )
             time.sleep(3)
             print("Rozpoczęto proces zamówienia")
@@ -831,8 +893,12 @@ class PrestaShopTester:
         print("=" * 60)
 
         try:
+<<<<<<< Updated upstream
             # Przejdź do konta
             self.driver.get(f"{self.base_url}/my-account")
+=======
+            self.driver.get(f"{self.base_url}/index.php?controller=authentication&back=my-account")
+>>>>>>> Stashed changes
             time.sleep(2)
 
             # Kliknij w historię zamówień
@@ -882,8 +948,13 @@ class PrestaShopTester:
         try:
             # Przejdź do historii zamówień
             print("Przechodzę do historii zamówień...")
+<<<<<<< Updated upstream
             self.driver.get(f"{self.base_url}/order-history")
             time.sleep(3)
+=======
+            self.driver.get(f"{self.base_url}/index.php?controller=history")
+            time.sleep(2)
+>>>>>>> Stashed changes
 
             # Jeśli mamy order reference, znajdź fakturę dla tego konkretnego zamówienia
             if self.order_reference:
@@ -1021,10 +1092,14 @@ class PrestaShopTester:
 
 
 def main():
+<<<<<<< Updated upstream
     """Główna funkcja"""
     # Możesz zmienić URL na swój
     BASE_URL = "https://localhost"
     # BASE_URL = "http://localhost:8080"
+=======
+    BASE_URL = "https://localhost:19776"
+>>>>>>> Stashed changes
 
     tester = PrestaShopTester(base_url=BASE_URL)
     tester.run_full_test()
